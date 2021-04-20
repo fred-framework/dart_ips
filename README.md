@@ -5,19 +5,19 @@ This repository has a list of ready-to-use hardware IPs and static parts for DAR
 
 ## Summary of IPs
 
-[//]: <> (This is also a comment.)
+[//]: <> (This is a comment.)
 
 The following table summarizes the existing IPs and some of their features.
-The columns refer to the existance of software example, the IP hardware description language, if it has a testbench, and if it has been tested in FPGA.
+The columns refer to the existance of software example, the IP hardware description language, if it has a testbench, and if it has been tested in FPGA. Go to each IP directory for their respective documentation.
 
-| IP name       | sw ex. | hw lang | tb | FPGA |
-|---------------|--------|---------|----|------|
-| FIR           |    N   |   cpp   | Y  |  N   |
-| memcpy        |    N   |   cpp   | Y  |  N   |
-| amalthea_prem |        |         |    |      |
-| amalthea_pipe |        |         |    |      |
-| mat_mult      |        |         |    |      |
-|               |        |         |    |      |
+| IP name                                      | sw ex. | hw lang | tb | FPGA |
+|----------------------------------------------|--------|---------|----|------|
+| [FIR](ips/fir/readme.md)                     |    N   |   cpp   | Y  |  N   |
+| [memcpy](ips/memcpy/readme.md)               |    N   |   cpp   | Y  |  N   |
+| [amalthea_prem](ips/amalthea_prem/readme.md) |    N   |   vhd   | Y  |  N   |
+| [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
+| mat_mult                                     |        |         |    |      |
+|                                              |        |         |    |      |
 
 ## guidelines and structure for IPs
 
