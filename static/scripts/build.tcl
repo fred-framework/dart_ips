@@ -10,25 +10,12 @@ package require fileutil
 set current_vivado_version [version -short]
 
 # complete here with all supported vivado version
-List<String> supported_vivado_version = new ArrayList<String>();
-list.add("2019.2");
-list.add("2018.3");
-list.add("2020.2");
+set supported_vivado_version [list 2018.3 2019.2 2020.2]
 
-if { [list.contains($current_vivado_version)} {
+if { [lsearch $supported_vivado_version $current_vivado_version] == -1} {
    puts ""
    puts "WARNING: this script was not tested with Vivado version $current_vivado_version"
 }
-
-
-# set scripts_vivado_version 2019.2
-
-# if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
-#    puts ""
-#    catch {common::send_msg_id "BD_TCL-109" "ERROR" "This script was generated using Vivado <$scripts_vivado_version> and is being run in <$current_vivado_version> of Vivado. Please run the script in Vivado <$scripts_vivado_version> then open the design in Vivado <$current_vivado_version>. Upgrade the design by running \"Tools => Report => Report IP Status...\", then run write_bd_tcl to create an updated script."}
-
-#    return 1
-# }
 
 ################################################################
 # Check required environment variables.
@@ -329,7 +316,6 @@ puts "========================"
 puts "Running synthesis ..."
 puts "========================"
 # perform the synthesis and/or generate the bitstream
-open_project ./vivado/${design_name}/${design_name}.xpr
 update_compile_order -fileset sources_1
 reset_run -quiet impl_1
 launch_runs impl_1 -to_step $syntesis_step -jobs 8

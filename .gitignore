@@ -1,0 +1,71 @@
+#Visual Code studio
+.vscode/**
+*-workspace
+
+#################################################
+#
+# IPs
+#
+#################################################
+ips/fir/hw/fir/**
+ips/memcpy/hw/memcpy/**
+
+#################################################
+#
+# Static part
+#
+#################################################
+**/hw/ips
+**/vivado
+*.rpt
+
+#################################################
+#
+# Vivado stuff
+#
+#################################################
+
+.Xil/**
+**/NA
+*.log
+*.jou
+
+
+#################################################
+#
+#  C++ RELATED DEFINITIONS
+#
+#################################################
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app

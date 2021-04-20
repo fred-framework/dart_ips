@@ -13,7 +13,7 @@
 #include "memcpy_top.hpp"
 #include "memcpy.hpp"
 
-void memcpy_top_0(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
+void memcpy_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
 {
 	// AXI Lite control bus
 	#pragma HLS INTERFACE s_axilite port=return bundle=ctrl_bus

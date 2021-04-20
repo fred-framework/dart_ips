@@ -36,7 +36,7 @@ int main()
 	args[0] = (args_t)((uint64_t)&mem_out[a_idx]);
 	args[1] = (args_t)((uint64_t)&mem_in[a_idx]);
 
-	memcpy_top_0(&id_out, args, mem_in, mem_out);
+	memcpy_top(&id_out, args, mem_in, mem_out);
 
 	if (memcmp(mem_in,mem_out, BLOCK_SIZE_BYTE) !=0){
 		printf("Mismatch!\n");

@@ -44,7 +44,7 @@ set bCheckIPsPassed 1
 set bCheckIPs 1
 if { $bCheckIPs == 1 } {
    set list_check_ips "\ 
-xilinx.com:hls:memcpy_top_0:1.0\
+xilinx.com:hls:memcpy_top:1.0\
 xilinx.com:ip:pr_decoupler:1.0\
 xilinx.com:ip:processing_system7:5.5\
 xilinx.com:ip:proc_sys_reset:5.0\
@@ -124,8 +124,8 @@ proc create_root_design { parentCell } {
    CONFIG.NUM_SI {1} \
  ] $axi_mem_intercon
 
-  # Create instance: memcpy_top_0_0, and set properties
-  set memcpy_top_0_0 [ create_bd_cell -type ip -vlnv xilinx.com:hls:memcpy_top_0:1.0 memcpy_top_0_0 ]
+  # Create instance: memcpy_top_0, and set properties
+  set memcpy_top_0 [ create_bd_cell -type ip -vlnv xilinx.com:hls:memcpy_top:1.0 memcpy_top_0 ]
 
   # Create instance: pr_decoupler_0, and set properties
   set pr_decoupler_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:pr_decoupler:1.0 pr_decoupler_0 ]
@@ -995,8 +995,8 @@ proc create_root_design { parentCell } {
 
   # Create interface connections
   connect_bd_intf_net -intf_net axi_mem_intercon_M00_AXI [get_bd_intf_pins axi_mem_intercon/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP0]
-  connect_bd_intf_net -intf_net memcpy_top_0_0_m_axi_mem_bus [get_bd_intf_pins memcpy_top_0_0/m_axi_mem_bus] [get_bd_intf_pins pr_decoupler_1/rp_mem]
-  connect_bd_intf_net -intf_net pr_decoupler_0_rp_ctrl [get_bd_intf_pins memcpy_top_0_0/s_axi_ctrl_bus] [get_bd_intf_pins pr_decoupler_0/rp_ctrl]
+  connect_bd_intf_net -intf_net memcpy_top_0_m_axi_mem_bus [get_bd_intf_pins memcpy_top_0/m_axi_mem_bus] [get_bd_intf_pins pr_decoupler_1/rp_mem]
+  connect_bd_intf_net -intf_net pr_decoupler_0_rp_ctrl [get_bd_intf_pins memcpy_top_0/s_axi_ctrl_bus] [get_bd_intf_pins pr_decoupler_0/rp_ctrl]
   connect_bd_intf_net -intf_net pr_decoupler_1_s_mem [get_bd_intf_pins axi_mem_intercon/S00_AXI] [get_bd_intf_pins pr_decoupler_1/s_mem]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
@@ -1005,15 +1005,15 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net ps7_0_axi_periph_M01_AXI [get_bd_intf_pins pr_decoupler_0/s_axi_reg] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI]
 
   # Create port connections
-  connect_bd_net -net memcpy_top_0_0_interrupt [get_bd_pins memcpy_top_0_0/interrupt] [get_bd_pins processing_system7_0/IRQ_F2P]
+  connect_bd_net -net memcpy_top_0_interrupt [get_bd_pins memcpy_top_0/interrupt] [get_bd_pins processing_system7_0/IRQ_F2P]
   connect_bd_net -net pr_decoupler_0_decouple_status [get_bd_pins pr_decoupler_0/decouple_status] [get_bd_pins pr_decoupler_1/decouple]
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins memcpy_top_0_0/ap_clk] [get_bd_pins pr_decoupler_0/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins axi_mem_intercon/ACLK] [get_bd_pins axi_mem_intercon/M00_ACLK] [get_bd_pins axi_mem_intercon/S00_ACLK] [get_bd_pins memcpy_top_0/ap_clk] [get_bd_pins pr_decoupler_0/aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] [get_bd_pins ps7_0_axi_periph/ACLK] [get_bd_pins ps7_0_axi_periph/M00_ACLK] [get_bd_pins ps7_0_axi_periph/M01_ACLK] [get_bd_pins ps7_0_axi_periph/S00_ACLK] [get_bd_pins rst_ps7_0_100M/slowest_sync_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_ps7_0_100M/ext_reset_in]
-  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins memcpy_top_0_0/ap_rst_n] [get_bd_pins pr_decoupler_0/s_axi_reg_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn [get_bd_pins axi_mem_intercon/ARESETN] [get_bd_pins axi_mem_intercon/M00_ARESETN] [get_bd_pins axi_mem_intercon/S00_ARESETN] [get_bd_pins memcpy_top_0/ap_rst_n] [get_bd_pins pr_decoupler_0/s_axi_reg_aresetn] [get_bd_pins ps7_0_axi_periph/ARESETN] [get_bd_pins ps7_0_axi_periph/M00_ARESETN] [get_bd_pins ps7_0_axi_periph/M01_ARESETN] [get_bd_pins ps7_0_axi_periph/S00_ARESETN] [get_bd_pins rst_ps7_0_100M/peripheral_aresetn]
 
   # Create address segments
-  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces memcpy_top_0_0/Data_m_axi_mem_bus] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
-  assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs memcpy_top_0_0/s_axi_ctrl_bus/Reg] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces memcpy_top_0/Data_m_axi_mem_bus] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x43C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs memcpy_top_0/s_axi_ctrl_bus/Reg] -force
   assign_bd_address -offset 0x43C10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs pr_decoupler_0/s_axi_reg/Reg] -force
 
 

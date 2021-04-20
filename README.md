@@ -50,7 +50,7 @@ All IPs must have the following directory structure:
         └── ...
 ```   
 
- - the *readme.md* file documents the IP, including usage information, configuration parameters, etc;
+ - the *readme.md* file documents the IP, including usage/perfomance/power reports, configuration parameters, etc;
  - the file *hw/build.tcl* is a script synthesis for Vivado (for Verilog or VHDL sources) or for Vivado HLS (for cpp sources). This script refers to the common synthesis script located at the *scripts* directory, at same level of the IP directory;
  - the *sw/Makefile* compiles the example application for the IP;
 
@@ -70,6 +70,9 @@ $ vivado -mode batch -source build.tcl
 ```
 
 For IPs based on Verilog or VHDL.
+
+The generated IP will be located in the directory *ips/<ip-name>/hw/<ip-name>/solution_0/impl/ip*.
+
 
 
 ## guidelines and structure for the static part of the design
@@ -101,7 +104,7 @@ All static parts must have the following directory structure:
 ```   
 
  - the *build.sh* script is set to rerun the synthesis to create a vivado design;
- - use the *readme.md* to document the design;
+ - use the *readme.md* to document the design including, for example, usage/perfomance/power reports;
  - if the static part is based on a block design, this file must be placed in the *hw/bd* directory;
  - if the static part is based on a HDL design, the hardware description files (.vhd and/or .v) must be placed in the *hw/hdl* directory;
  - if there is a testbench, this must be placed in the *hw/sim* directory;
@@ -116,4 +119,6 @@ Go to the directory *static/<static-name>/* and run:
 $ ./build.sh
 ```   
 
-The generated design is located in the vivado directory.
+The generated design is located in the *vivado* directory.
+The generated DCP file is located in the directory *static/<static-name>/vivado/<proj-name>/<proj-name>.runs/synth_1/<proj-name>_wrapper.dcp.
+
