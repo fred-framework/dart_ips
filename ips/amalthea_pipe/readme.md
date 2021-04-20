@@ -1,6 +1,6 @@
 # AMALTHEA PIPE IP
 
-This IP is used with the AMALTHEA design flow to mimic the behavior of a generic hardware accelerator. The user can configure:
+This IP is used with the [AMALTHEA](https://projects.eclipse.org/projects/automotive.app4mc/downloads) design flow to mimic the behavior of a generic hardware accelerator. The user can configure:
 
  - the number of bytes read by the IP;
  - the number of clock cycles the IP spend executing some dommy logic; and
