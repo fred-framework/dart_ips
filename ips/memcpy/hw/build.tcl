@@ -16,7 +16,7 @@ add_files src/memcpy.cpp
 add_file -tb tb/tb.cpp
 
 # the generic part of the HLS script
-source ../../scripts/ip_hls.tcl
+source ../../../scripts/ip_hls.tcl
 
 close_project
 exit

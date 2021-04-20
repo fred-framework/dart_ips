@@ -15,7 +15,7 @@ add_files src/fir_top.cpp
 add_file -tb src/tb.cpp
 
 # the generic part of the HLS script
-source ../../scripts/ip_hls.tcl
+source ../../../scripts/ip_hls.tcl
 
 close_project
 exit

@@ -16,4 +16,4 @@ set VIVADO_SYN_STEP place_design
 # dont change from this point
 ################################################
 
-source ../scripts/build.tcl
+source ../../scripts/build.tcl
