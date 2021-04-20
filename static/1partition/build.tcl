@@ -1,6 +1,6 @@
 # Set these variables accordingly before executing the script
-set VIVADO_DESIGN_NAME amaltea_prem
-set VIVADO_TOP_NAME ${VIVADO_DESIGN_NAME}
+set VIVADO_DESIGN_NAME fred_static
+set VIVADO_TOP_NAME ${VIVADO_DESIGN_NAME}_wrapper
 # The valid values for DART_BOARD are: pynq or zynq
 set DART_BOARD pynq
 

@@ -10,4 +10,4 @@ This IP is called PIPE because it executes in parallel (i.e. like a pipeline) re
 
 ## Authors
 
-- Marco Pagani (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.
+- Francesco Restuccia (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.

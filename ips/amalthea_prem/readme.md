@@ -10,4 +10,4 @@ This IP is called PREM because it obbeys the [Pretictable Execution Model](https
 
 ## Authors
 
-- Marco Pagani (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.
+- Francesco Restuccia (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.

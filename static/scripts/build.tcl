@@ -24,38 +24,38 @@ puts "========================"
 puts "Checking inputs ..."
 puts "========================"
 
-if { ![info exists env(VIVADO_DESIGN_NAME)] } {
+if { [string length $VIVADO_DESIGN_NAME] == 0} {
     puts "ERROR: Please set the environment variable VIVADO_DESIGN_NAME before running the script"
     return
 }
-set design_name $::env(VIVADO_DESIGN_NAME)
+set design_name $VIVADO_DESIGN_NAME
 puts "Using design name: ${design_name}"
 
-if { ![info exists env(VIVADO_TOP_NAME)] } {
+if { [string length $VIVADO_TOP_NAME] == 0} {
     puts "WARNING: No top design defined. Using the default top name ${design_name}_wrapper"
     set top_name ${design_name}_wrapper
 } else {
-  set top_name $::env(VIVADO_TOP_NAME)
+  set top_name $VIVADO_TOP_NAME
   puts "Using top name: ${top_name}"
 }
 
 # check the command 'launch_runs' learn more
 # the valid steps are:
 #  - opt_design, power_opt_design, place_design, route_design, phys_opt_design, and write_bitstream
-if { ![info exists env(VIVADO_SYN_STEP)] } {
+if { [string length $VIVADO_SYN_STEP] == 0} {
     puts "WARNING: the synthesis step is not defined. Using the default 'place_design'"
     set syntesis_step place_design
 } else {
-  set syntesis_step $::env(VIVADO_SYN_STEP)
+  set syntesis_step $VIVADO_SYN_STEP
   puts "Using synthesis step: ${syntesis_step}"
 }
 
 # the supported board as pynq and zynq
-if { ![info exists env(DART_BOARD)] } {
+if { [string length $DART_BOARD] == 0} {
     puts "WARNING: the FPGA board is not defined. Using the default 'pynq'"
     set dart_board place_design
 } else {
-  set dart_board $::env(DART_BOARD)
+  set dart_board $DART_BOARD
   # checking for the supported boards
   if {$dart_board != "pynq" && $dart_board != "zynq"} {
     puts "ERROR: Please set the environment variable DART_BOARD with one of the supported boards: pynq or zynq"
