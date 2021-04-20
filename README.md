@@ -1,7 +1,7 @@
 
 # DART IPs
 
-This repository has a list of ready-to-use hardware IPs for DART.
+This repository has a list of ready-to-use hardware IPs and static parts for DART.
 
 ## Summary of IPs
 
@@ -12,8 +12,8 @@ The columns refer to the existance of software example, the IP hardware descript
 
 | IP name       | sw ex. | hw lang | tb | FPGA |
 |---------------|--------|---------|----|------|
-| FIR           |    Y   |    N    |    |      |
-| memcpy        |        |         |    |      |
+| FIR           |    N   |   cpp   | Y  |  N   |
+| memcpy        |    N   |   cpp   | Y  |  N   |
 | amalthea_prem |        |         |    |      |
 | amalthea_pipe |        |         |    |      |
 | mat_mult      |        |         |    |      |
@@ -122,3 +122,13 @@ $ ./build.sh
 The generated design is located in the *vivado* directory.
 The generated DCP file is located in the directory *static/<static-name>/vivado/<proj-name>/<proj-name>.runs/synth_1/<proj-name>_wrapper.dcp.
 
+# Authors
+
+- Alexandre Amory (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.
+
+
+# Funding
+
+This tool has been developed in the context of the [AMPERE project](https://ampere-euproject.eu/).
+This project has received funding from the European Union’s Horizon 2020 
+research and innovation programme under grant agreement No 871669.
