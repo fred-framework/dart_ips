@@ -1,6 +1,6 @@
-# FRED Static Part
+# FRED Static Part (TO BE DONE !!!!)
 
-This repo contains an example design of the static part of the FRED design, considering a **single reconfigurable region**. The design is fully automated with TCL scripts so you dont need to save the entire Vivado design.
+This repo contains an example design of the static part of the FRED design, considering a **three reconfigurable regions**. The design is fully automated with TCL scripts so you dont need to save the entire Vivado design.
 The project is setup for PYNQ board, although it would be easy to change to other boards assuming you have some basic TCL skills.
 
 # FRED static part

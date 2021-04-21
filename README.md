@@ -32,7 +32,7 @@ The columns refer to the number of existing partitions in he design, the number 
 | [1partition](static/1partition/readme.md)    |    1         |   1     | generic     |
 | [2partition](static/2partition/readme.md)    |    2         |   1     | generic     |
 | [3partition](static/3partition/readme.md)    |    3         |   1     | generic     |
-| [img_filter2](static/img_filters/readme.md)  |    3         |   x     | image proc. |
+| [img_filters](static/img_filters/readme.md)  |    3         |   x     | image proc. |
 |                                              |              |         |             |
 
 
