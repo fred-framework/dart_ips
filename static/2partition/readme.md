@@ -15,7 +15,7 @@ The following report includes two memcpy IPs and it considers the board PYNQ-Z1 
 
 
 |          Site Type         | Used | Fixed | Available | Util% |
-|----------------------------|------|-------|-----------|-------|
+|----------------------------|-----:|------:|----------:|------:|
 | Slice LUTs*                | 4344 |     0 |     53200 |  8.17 |
 |   LUT as Logic             | 4012 |     0 |     53200 |  7.54 |
 |   LUT as Memory            |  332 |     0 |     17400 |  1.91 |
