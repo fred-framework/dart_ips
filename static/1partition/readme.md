@@ -31,11 +31,15 @@ The following report includes one memcpy IP and it considers the board PYNQ-Z1 (
 These scripts are assuming Linux operation system (Ubuntu 18.04) and Vivado 2019.2.
 
 Follow these instructions to recreate the Vivado and SDK projects:
- - Open the **build.sh** script and edit the first lines to setup these environment variables:
+ - Open the **build.tcl** script and edit the first lines to setup these environment variables:
     - **VIVADO_DESIGN_NAME**: mandatory name of the design;
     - **VIVADO_TOP_NAME**: set the top name (optional);
     - **VIVADO_SYN_STEP**: the DART compatible boards: pynq or zynq.
- - run *build.sh*
+ - run the following command in the terminal:
+
+ ```
+ $ vivado -mode batch -source build.tcl
+ ```
 
 These scripts will recreate the entire Vivado project and synthesize the design.
 
