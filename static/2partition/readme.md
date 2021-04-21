@@ -26,7 +26,6 @@ The following report includes two memcpy IPs and it considers the board PYNQ-Z1 
 |   Register as Latch        |    0 |     0 |    106400 |  0.00 |
 | F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
 | F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
-|----------------------------|------|-------|-----------|-------|
 
 # How to run it
 
