@@ -14,7 +14,7 @@ This is an image of the block design of the FRED static part.
 The following report includes one memcpy IP and it considers the board PYNQ-Z1 (xc7z020clg400-1). 
 
 |          Site Type         | Used | Fixed | Available | Util% |
-|----------------------------|------|-------|-----------|-------|
+|----------------------------|-----:|------:|----------:|------:|
 | Slice LUTs*                | 2418 |     0 |     53200 |  4.55 |
 |   LUT as Logic             | 2224 |     0 |     53200 |  4.18 |
 |   LUT as Memory            |  194 |     0 |     17400 |  1.11 |
