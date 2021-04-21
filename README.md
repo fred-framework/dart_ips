@@ -163,8 +163,8 @@ All static parts must have the following directory structure:
 
  - the *build.tcl* script is set to rerun the synthesis to create a vivado design;
  - use the *readme.md* to document the design including, for example, usage/perfomance/power reports;
- - if the static part is based on a block design, this file must be placed in the *hw/bd* directory;
- - if the static part is based on a HDL design, the hardware description files (.vhd and/or .v) must be placed in the *hw/hdl* directory;
+ - the static part is typically based on a block design, thus, the BD file must be placed in the *hw/bd* directory;
+ - since the static part is based on block design, the *hw/hdl* directory, where hardware description files (.vhd and/or .v) are saved, must be empty;
  - if there is a testbench, this must be placed in the *hw/sim* directory;
  - if there are constraint files, these must be placed in the *hw/xdc* directory;
  - the IPs under DPR must be linked in the *hw/ips* directory. The default IP is the memcpy IP. Just replace the  symbolic links to point to other IPs directories;
