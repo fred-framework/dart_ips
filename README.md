@@ -19,6 +19,23 @@ The columns refer to the existance of software example, the IP hardware descript
 | mat_mult                                     |        |         |    |      |
 |                                              |        |         |    |      |
 
+
+## Summary of Static Parts
+
+[//]: <> (This is a comment.)
+
+The following table summarizes the existing Static Parts and some of their features.
+The columns refer to the number of existing partitions in he design, the number of IPs for DPR, and a brief description of its application. Click in the link to go to their respective documentations.
+
+| IP name                                      | # partitions | # cores | application |
+|----------------------------------------------|--------------|---------|-------------|
+| [1partition](static/1partition/readme.md)    |    1         |   1     | generic     |
+| [2partition](static/2partition/readme.md)    |    2         |   1     | generic     |
+| [3partition](static/3partition/readme.md)    |    3         |   1     | generic     |
+| [img_filter2](static/img_filters/readme.md)  |    3         |   x     | image proc. |
+|                                              |              |         |             |
+
+
 # Guidelines and structure for IPs
 
 All IPs should follow these guidelines and this structure in order to reuse the scripts and minimize the integration issues with DART and FRED. The rest of this section show the IP guidelines and the structure for the **two kinds of IPs: HLS and RTL**.
