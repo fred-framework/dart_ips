@@ -9,6 +9,26 @@ This is an image of the block design of the FRED static part.
 
 ![FRED static part block design](FRED-static.png)
 
+# Utilization report
+
+The following report includes two memcpy IPs and it considers the board PYNQ-Z1 (xc7z020clg400-1). 
+
+
++----------------------------+------+-------+-----------+-------+
+|          Site Type         | Used | Fixed | Available | Util% |
++----------------------------+------+-------+-----------+-------+
+| Slice LUTs*                | 4344 |     0 |     53200 |  8.17 |
+|   LUT as Logic             | 4012 |     0 |     53200 |  7.54 |
+|   LUT as Memory            |  332 |     0 |     17400 |  1.91 |
+|     LUT as Distributed RAM |   10 |     0 |           |       |
+|     LUT as Shift Register  |  322 |     0 |           |       |
+| Slice Registers            | 5809 |     0 |    106400 |  5.46 |
+|   Register as Flip Flop    | 5809 |     0 |    106400 |  5.46 |
+|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
+| F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
+| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
++----------------------------+------+-------+-----------+-------+
+
 # How to run it
 
 These scripts are assuming Linux operation system (Ubuntu 18.04) and Vivado 2019.2.
