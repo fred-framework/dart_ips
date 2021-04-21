@@ -1,4 +1,4 @@
-# FRED Static Part (TO BE DONE !!!!)
+# FRED Static Part
 
 This repo contains an example design of the static part of the FRED design, considering a **three reconfigurable regions**. The design is fully automated with TCL scripts so you dont need to save the entire Vivado design.
 The project is setup for PYNQ board, although it would be easy to change to other boards assuming you have some basic TCL skills.
@@ -9,16 +9,39 @@ This is an image of the block design of the FRED static part.
 
 ![FRED static part block design](FRED-static.png)
 
+
+# Utilization report
+
+The following report includes three memcpy IPs and it considers the board PYNQ-Z1 (xc7z020clg400-1). 
+
+|          Site Type         | Used | Fixed | Available | Util% |
+|----------------------------|-----:|------:|----------:|------:|
+| Slice LUTs*                | 6009 |     0 |     53200 | 11.30 |
+|   LUT as Logic             | 5548 |     0 |     53200 | 10.43 |
+|   LUT as Memory            |  461 |     0 |     17400 |  2.65 |
+|     LUT as Distributed RAM |   10 |     0 |           |       |
+|     LUT as Shift Register  |  451 |     0 |           |       |
+| Slice Registers            | 7986 |     0 |    106400 |  7.51 |
+|   Register as Flip Flop    | 7986 |     0 |    106400 |  7.51 |
+|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
+| F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
+| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
+
+
 # How to run it
 
 These scripts are assuming Linux operation system (Ubuntu 18.04) and Vivado 2019.2.
 
 Follow these instructions to recreate the Vivado and SDK projects:
- - Open the **build.sh** script and edit the first lines to setup these environment variables:
+ - Open the **build.tcl** script and edit the first lines to setup these environment variables:
     - **VIVADO_DESIGN_NAME**: mandatory name of the design;
     - **VIVADO_TOP_NAME**: set the top name (optional);
     - **VIVADO_SYN_STEP**: the DART compatible boards: pynq or zynq.
- - run *build.sh*
+ - run the following command in the terminal:
+
+ ```
+ $ vivado -mode batch -source build.tcl
+ ```
 
 These scripts will recreate the entire Vivado project and synthesize the design.
 
