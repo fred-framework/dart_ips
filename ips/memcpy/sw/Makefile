@@ -1,8 +1,8 @@
 appname = memcpy
-fred_dir = ./fred_lib
-srcs = $(wildcard *.c)
+fred_dir = /fredsys/fred_lib
+srcs = $(wildcard ./src/*.c)
 # cpp compilation is not working yet
-cxx_srcs += $(wildcard *.cpp)
+cxx_srcs += $(wildcard ./src/*.cpp)
 objs = $(srcs:.c=.o) $(cxx_srcs:.cpp=.o)
 deps = $(objs:.o=.d)
 
@@ -16,5 +16,5 @@ $(appname): $(objs)
 
 .PHONY: clean
 clean:
-	make -C ./fred_lib clean
+	make -C $(fred_dir) clean
 	rm -f $(objs) $(deps) $(appname)

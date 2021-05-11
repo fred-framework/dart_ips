@@ -1,22 +1,20 @@
-libname = fred
-srcs = $(wildcard *.c) $(wildcard **/*.c)
-objs = $(srcs:.c=.o)
+appname = fir
+fred_dir = /fredsys/fred_lib
+srcs = $(wildcard ./src/*.c)
+# cpp compilation is not working yet
+cxx_srcs += $(wildcard ./src/*.cpp)
+objs = $(srcs:.c=.o) $(cxx_srcs:.cpp=.o)
 deps = $(objs:.o=.d)
 
-CFLAGS += -std=gnu99 -g -Wall -Werror -fpic
-LDFLAGS += -shared
+CFLAGS += -I $(fred_dir) -I $(fred_dir)/fred_support -g  # -Wall  -Werror
+CXXFLAGS += $(CFLAGS)
+LDFLAGS += -L $(fred_dir) -lfred
 
-$(libname).so: $(objs)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-# include all dep
--include $(deps)
-
-# Build header includes dependencies using c preprocessor
-%.d: %.c
-	$(CPP) $< -MM -MT $(@:.d=.o) > $@
+$(appname): $(objs)
+	make -C $(fred_dir) CC=$(CC)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY: clean
 clean:
-	rm -f $(libname).so $(objs) $(deps)
-
+	make -C $(fred_dir) clean
+	rm -f $(objs) $(deps) $(appname)
