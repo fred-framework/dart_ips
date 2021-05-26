@@ -22,7 +22,7 @@ void print_vect(unsigned int base_idx, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
 		//std::cout << mem_in[base_idx + i] << "\t" << mem_out[base_idx + i] << "\n";
-		printf("%d\t%d\n");
+		printf("%d\t%d\n",i,mem_out[i]);
 	}
 	printf("\n");
 	//std::cout << std::endl;
