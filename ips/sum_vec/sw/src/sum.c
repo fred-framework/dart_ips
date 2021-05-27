@@ -8,9 +8,6 @@
 #define  ARRAY_SIZE (1024)
 #define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(uint32_t))
 
-// uint32_t A_in[ARRAY_SIZE];
-// uint32_t B_in[ARRAY_SIZE];
-// uint32_t C_out[ARRAY_SIZE];
 uint32_t *A_in, *B_in, *C_out;
 
 const int hw_id = 100;
@@ -89,9 +86,6 @@ int main (int argc, char **argv)
 	// set the memcpy parameters (dest, source)
 	init_vect(A_in, 0);
 	init_vect(B_in, 1);
-	// *(hw_vsum_buff_in0 + 0) = (uint64_t) C_out;
-	// *(hw_vsum_buff_in0 + 1) = (uint64_t) A_in;
-	// *(hw_vsum_buff_in0 + 2) = (uint64_t) B_in;
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_vsum);
@@ -101,7 +95,7 @@ int main (int argc, char **argv)
 	}	
 
 	//validate
-	
+	int error_code = 0;
 	if (check_output(C_out, ARRAY_SIZE) != ARRAY_SIZE){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
