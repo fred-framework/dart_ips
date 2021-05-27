@@ -72,10 +72,12 @@ int main (int argc, char **argv)
 	fred_accel(fred, hw_vsum);
 
 	//validate
+	int error_code = 0;
 	if (check_output(C_out, ARRAY_SIZE) != ARRAY_SIZE){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
 		print_vect(C_out, 10);
+		error_code = 1;
 	}else{
 		//std::cout << "Match!\n";
 		printf("Match!\n");

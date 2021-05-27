@@ -1,4 +1,4 @@
-appname = sum_vec
+appname = fir
 fred_dir = /fredsys/fred_lib
 srcs = $(wildcard ./src/*.c)
 # cpp compilation is not working yet
