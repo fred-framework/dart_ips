@@ -1,4 +1,4 @@
-appname = memcpy
+appname = sum_vec
 fred_dir = /fredsys/fred_lib
 srcs = $(wildcard ./src/*.c)
 # cpp compilation is not working yet

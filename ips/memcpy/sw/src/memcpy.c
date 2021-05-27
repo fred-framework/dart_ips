@@ -6,15 +6,18 @@
 
 // make sure these constants match with the hw design
 #define  BLOCK_SIZE_BYTE (10 * 1024)
-#define  BLOCK_SIZE_DT (BLOCK_SIZE_BYTE / sizeof(uint64_t))
+#define  BLOCK_SIZE_DT (BLOCK_SIZE_BYTE / sizeof(uint32_t))
 
-uint64_t mem_in[BLOCK_SIZE_DT];
-uint64_t mem_out[BLOCK_SIZE_DT];
+// uint32_t mem_in[BLOCK_SIZE_DT];
+// uint32_t mem_out[BLOCK_SIZE_DT];
 
-void init_vect(unsigned int base_idx, int value)
+uint32_t *mem_in, *mem_out;
+
+void init_vect(uint32_t *base, int value)
 {
 	for (unsigned int i = 0; i < BLOCK_SIZE_DT; ++i) {
-		mem_in[base_idx + i] = value + i;
+		base = value + i;
+		base++;
 	}
 }
 
@@ -32,32 +35,58 @@ int main (int argc, char **argv)
 {
 	//std::cout << " starting memcpy \n";
 	printf(" starting memcpy \n");
+	int retval, error_code;
 
-	init_vect(0, 0);
+
 	
 	struct fred_data *fred;
 	struct fred_hw_task *hw_memcpy;
     
 	//sw_task_init(&fred);
 
-	fred_init(&fred);
+	retval = fred_init(&fred);
+	if (retval) {
+		printf("fred_init failed \n");
+		error_code = 1;
+	}		
 	
 	// Bind with HW-memcpy having hw-id 100
-	fred_bind(fred, &hw_memcpy, 100);
+	retval = fred_bind(fred, &hw_memcpy, 100);
+	if (retval) {
+		printf("fred_bind failed \n");
+		error_code = 1;
+	}		
 
-	uint64_t *hw_memcpy_buff_in0;
-	// this buffer is not actually used
-	uint64_t *hw_memcpy_buff_out0;
+	// uint64_t *hw_memcpy_buff_in0;
+	// // this buffer is not actually used
+	// uint64_t *hw_memcpy_buff_out0;
 
-	hw_memcpy_buff_in0 = (uint64_t*) fred_map_buff(fred, hw_memcpy, 0);
-	hw_memcpy_buff_out0 = (uint64_t*) fred_map_buff(fred, hw_memcpy, 1);
+	mem_out = fred_map_buff(fred, hw_memcpy, 0);
+	if (mem_out) {
+		printf("fred_map_buff failed on buff 0 for mem_out\n");
+		error_code = 1;
+	}		
+	mem_in = fred_map_buff(fred, hw_memcpy, 1);
+	if (mem_in) {
+		printf("fred_map_buff failed on buff 1 for mem_in\n");
+		error_code = 1;
+	}		
 
 	// set the memcpy parameters (dest, source)
-	*(hw_memcpy_buff_in0 + 0) = (uint64_t) mem_out;
-	*(hw_memcpy_buff_in0 + 1) = (uint64_t) mem_in;
+	//init_vect(mem_in, 0);
+	for (unsigned int i = 0; i < BLOCK_SIZE_DT; ++i) {
+		*(mem_in+i) = i;
+		//base++;
+	}
+	// *(hw_memcpy_buff_in0 + 0) = (uint64_t) mem_out;
+	// *(hw_memcpy_buff_in0 + 1) = (uint64_t) mem_in;
 
 	// Call fred IP
-	fred_accel(fred, hw_memcpy);
+	retval = fred_accel(fred, hw_memcpy);
+	if (retval) {
+		printf("fred_accel failed \n");
+		error_code = 1;
+	}		
 
 	//validate
 	int error_code = memcmp(mem_in,mem_out, BLOCK_SIZE_BYTE);

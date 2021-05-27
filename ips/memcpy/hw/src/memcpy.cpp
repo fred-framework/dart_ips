@@ -13,15 +13,15 @@
 #include "memcpy.hpp"
 //#include <iostream>
 
-void memcpy(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
+void memcpy(volatile data_t *mem_in, volatile data_t *mem_out)
 {
-	#pragma HLS DATAFLOW
+	//#pragma HLS DATAFLOW
 
-	*id = MODULE_ID;
+	//*id = MODULE_ID;
 	data_t temp;
 
-	args_t arg_out = args[0];
-	args_t arg_in = args[1];
+	//args_t arg_out = args[0];
+	//args_t arg_in = args[1];
 
 	for (int i = 0; i < BLOCK_SIZE_DT; ++i) {
 		#pragma HLS PIPELINE
@@ -30,7 +30,7 @@ void memcpy(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatil
 		//printf("%p\n",(mem_in + i + (arg_in / sizeof(data_t))));
 		//temp = *(mem_in + i + (arg_in / sizeof(data_t)));
 		//*(mem_out + i + (arg_out / sizeof(data_t))) = temp;
-		temp = *(mem_in + i);
-		*(mem_out + i ) = temp;
+		temp = mem_in[i];
+		mem_out[i] = temp;
 	}
 }
