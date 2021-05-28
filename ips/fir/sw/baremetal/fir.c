@@ -50,13 +50,16 @@
 #include "xil_printf.h"
 #include "xscugic.h"
 #include "xparameters.h"
-#include "xacc_hw.h"
-#include "xacc.h"
 #include "xil_cache.h"
+//#include "xacc_hw.h"
+//#include "xacc.h"
+#include "xfir_top_hw.h"
+#include "xfir_top.h"
+
 
 #include <stdio.h>
 //#include "fred_lib.h"
-XAcc fir_inst;
+XFir_top fir_inst;
 XScuGic ScuGic; //Interrupt Controller Instance
 
 unsigned int ResultAvailfir = 0;
@@ -87,14 +90,16 @@ int main()
     status = fir_init(&fir_inst);
     if(status != XST_SUCCESS){
        print("HLS peripheral setup failed\n\r");
-       exit(-1);
+       return 1;
     }
+    printf(" fir_init done!\n\r");
 
     status = setup_interrupt();
     if(status != XST_SUCCESS){
        print("Interrupt setup failed\n\r");
-       exit(-1);
+       return 1;
     }
+    printf(" setup_interrupt done!\n\r");
 
     //init the fir input buffer
     for(unsigned i = 0; i < BUFF_SIZE; i++) {
@@ -110,22 +115,23 @@ int main()
                 out_buff_gold[n] += coeff[i] * in_buff[n - i];
             }
         }
+    printf(" gold done!\n\r");
 
     //send input and output buffer to fir_acc
-    Xil_Out32(XPAR_XACC_0_S_AXI_CTRL_BUS_BASEADDR +
-    		XACC_CTRL_BUS_ADDR_MEM_IN_V_DATA,
+    Xil_Out32(XPAR_XFIR_TOP_0_S_AXI_CTRL_BUS_BASEADDR +
+    		XFIR_TOP_CTRL_BUS_ADDR_MEM_IN_V_DATA,
     		 (UINTPTR)in_buff);
-    Xil_Out32(XPAR_XACC_0_S_AXI_CTRL_BUS_BASEADDR +
-    		XACC_CTRL_BUS_ADDR_MEM_OUT_V_DATA,
+    Xil_Out32(XPAR_XFIR_TOP_0_S_AXI_CTRL_BUS_BASEADDR +
+    		XFIR_TOP_CTRL_BUS_ADDR_MEM_OUT_V_DATA,
 			(UINTPTR)out_buff);
 
     printf("%p %p \n", in_buff, out_buff);
 
-    if (XAcc_IsReady(&fir_inst))
+    if (XFir_top_IsReady(&fir_inst))
        print("HLS peripheral is ready.  Starting... ");
     else {
        print("!!! HLS peripheral is not ready! Exiting...\n\r");
-       exit(-1);
+       return 1;
     }
 
     if (1) { // use interrupt
@@ -133,9 +139,9 @@ int main()
        while(!ResultAvailfir); //spin
        print("Interrupt received from HLS HW.\n\r");
     } else { // Simple non-interrupt driven test
-       XAcc_Start(&fir_inst);
+       XFir_top_Start(&fir_inst);
        do {
-       } while (!XAcc_IsReady(&fir_inst));
+       } while (!XFir_top_IsReady(&fir_inst));
        print("Detected FIR peripheral complete. Result received.\n\r");
     }
 
@@ -157,17 +163,17 @@ int main()
 }
 
 
-int fir_init(XAcc *firPtr)
+int fir_init(XFir_top *firPtr)
 {
-   XAcc_Config *cfgPtr;
+   XFir_top_Config *cfgPtr;
    int status;
 
-   cfgPtr = XAcc_LookupConfig(XPAR_XACC_0_DEVICE_ID);
+   cfgPtr = XFir_top_LookupConfig(XPAR_XFIR_TOP_0_DEVICE_ID);
    if (!cfgPtr) {
-      print("ERROR: Lookup of acclerator configuration failed.\n\r");
+      print("ERROR: Lookup of accelerator configuration failed.\n\r");
       return XST_FAILURE;
    }
-   status = XAcc_CfgInitialize(firPtr, cfgPtr);
+   status = XFir_top_CfgInitialize(firPtr, cfgPtr);
    if (status != XST_SUCCESS) {
       print("ERROR: Could not initialize accelerator.\n\r");
       return XST_FAILURE;
@@ -176,10 +182,10 @@ int fir_init(XAcc *firPtr)
 }
 
 void fir_start(void *InstancePtr){
-	XAcc *pAccelerator = (XAcc *)InstancePtr;
-	XAcc_InterruptEnable(pAccelerator,1);
-	XAcc_InterruptGlobalEnable(pAccelerator);
-	XAcc_Start(pAccelerator);
+	XFir_top *pAccelerator = (XFir_top *)InstancePtr;
+	XFir_top_InterruptEnable(pAccelerator,1);
+	XFir_top_InterruptGlobalEnable(pAccelerator);
+	XFir_top_Start(pAccelerator);
 }
 
 
@@ -210,26 +216,26 @@ int setup_interrupt()
 	   Xil_ExceptionEnable();
 	   // Connect the Adder ISR to the exception table
 	   //print("Connect the Adder ISR to the Exception handler table\n\r");
-	   result = XScuGic_Connect(&ScuGic,XPAR_FABRIC_ACC_0_INTERRUPT_INTR,(Xil_InterruptHandler)fir_isr,&fir_inst);
+	   result = XScuGic_Connect(&ScuGic,XPAR_FABRIC_FIR_TOP_0_INTERRUPT_INTR,(Xil_InterruptHandler)fir_isr,&fir_inst);
 	   if(result != XST_SUCCESS){
 	      return result;
 	   }
 	   //print("Enable the Adder ISR\n\r");
-	   XScuGic_Enable(&ScuGic,XPAR_FABRIC_ACC_0_INTERRUPT_INTR);
+	   XScuGic_Enable(&ScuGic,XPAR_FABRIC_FIR_TOP_0_INTERRUPT_INTR);
 	   return XST_SUCCESS;
 }
 
 void fir_isr(void *InstancePtr)
 {
-	   XAcc *pAccelerator = (XAcc *)InstancePtr;
+	   XFir_top *pAccelerator = (XFir_top *)InstancePtr;
 
 	   //Disable the global interrupt
-	   XAcc_InterruptGlobalDisable(pAccelerator);
+	   XFir_top_InterruptGlobalDisable(pAccelerator);
 	   //Disable the local interrupt
-	   XAcc_InterruptDisable(pAccelerator,0xffffffff);
+	   XFir_top_InterruptDisable(pAccelerator,0xffffffff);
 
 	   // clear the local interrupt
-	   XAcc_InterruptClear(pAccelerator,1);
+	   XFir_top_InterruptClear(pAccelerator,1);
 
 	   ResultAvailfir = 1;
 	   // restart the core if it should run again
