@@ -96,8 +96,7 @@ int main (int argc, char **argv)
 	}	
 
 	//validate
-	int error_code = 0;
-	if (check_output(C_out, ARRAY_SIZE,2*1) != 1){
+	if (check_output(C_out, ARRAY_SIZE,2^1) != 1){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
 		print_vect(C_out, 10);
