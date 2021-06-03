@@ -29,13 +29,14 @@ void print_vect(uint32_t *base, unsigned int size)
 	//std::cout << std::endl;
 }
 
-uint32_t check_output(uint32_t *base, unsigned int size)
+uint32_t check_output(uint32_t *base, unsigned int size, unsigned int expected_value)
 {
 	uint32_t sum=0;
 	for (unsigned int i = 0; i < size; ++i) {
-		sum += base[i];
+		if (base[i] != expected_value)
+			return 0;
 	}
-	return sum;
+	return 1;
 }
 
 int main (int argc, char **argv)
@@ -96,7 +97,7 @@ int main (int argc, char **argv)
 
 	//validate
 	int error_code = 0;
-	if (check_output(C_out, ARRAY_SIZE) != ARRAY_SIZE){
+	if (check_output(C_out, ARRAY_SIZE,0+1) != 1){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
 		print_vect(C_out, 10);
