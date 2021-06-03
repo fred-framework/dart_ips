@@ -99,6 +99,11 @@ int main (int argc, char **argv)
 	if (check_output(C_out, ARRAY_SIZE,0+1) != 1){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
+		printf("Content of A[0:9]:\n");
+		print_vect(A_in, 10);
+		printf("Content of B[0:9]:\n");
+		print_vect(B_in, 10);
+		printf("Content of C[0:9]:\n");
 		print_vect(C_out, 10);
 		error_code = 1;
 	}else{
