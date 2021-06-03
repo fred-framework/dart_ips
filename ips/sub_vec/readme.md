@@ -1,7 +1,7 @@
 
-# sum_vec IP
+# sub_vec IP
 
-This IP adds two vectors of 1024 integers and stores the result into a 3rd vector.
+This IP subtracts two vectors of 1024 integers and stores the result into a 3rd vector.
 
 Check the software example in the *sw* directory to see how to use this IP.
 
