@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include "ap_int.h"
 
-typedef uint64_t args_t;
+typedef uint32_t args_t;
 typedef uint32_t data_t;
 
 static const uint8_t ARGS_SIZE = 8;
