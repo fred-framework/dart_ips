@@ -24,7 +24,7 @@ void memcpy(volatile data_t *mem_in, volatile data_t *mem_out)
 	//args_t arg_in = args[1];
 
 	for (int i = 0; i < BLOCK_SIZE_DT; ++i) {
-		#pragma HLS PIPELINE
+		//#pragma HLS PIPELINE
 		//printf("%p - %#X\n",mem_in,arg_in);
 		//printf("%p\n",(mem_in + i));
 		//printf("%p\n",(mem_in + i + (arg_in / sizeof(data_t))));

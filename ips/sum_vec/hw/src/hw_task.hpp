@@ -16,8 +16,9 @@
 #include <stdint.h>
 #include "ap_int.h"
 
+// currently DART requires these types for args_t and data_t
 typedef uint32_t args_t;
-typedef uint32_t data_t;
+typedef uint64_t data_t;
 
 static const uint8_t ARGS_SIZE = 8;
 
