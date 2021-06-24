@@ -9,8 +9,8 @@ SHELL=/bin/bash
 #$(info $$SUBDIRS is: ${SUBDIRS})
 #$(info <<<<<<<<<<<<<<<)
 SUBDIRS = memcpy mul_vec nor_vec sub_vec sum_vec xor_vec
-$(info $$SUBDIRS is: ${SUBDIRS})
 
+ORIG_DIR = $(PWD)
 ifndef XILINX_VIVADO
 $(error XILINX_VIVADO is not defined)
 endif
@@ -35,4 +35,18 @@ clean:
 		done;
 		@echo "Done!"
 
-# TODO: create a rule to create all symbolic links in DART_IP_PATH
+link:
+	@for a in $(SUBDIRS); do \
+		if [ -d $$a ]; then \
+			echo "creating symbolic link to IP $$a"; \
+			ln -fs $(PWD)/$$a/hw/$$a/solution_0/impl/ip/ $(DART_IP_PATH)/$$a; \
+		fi; \
+		done;
+		@echo "Done!"
+
+help:
+	@echo "Makefile to compile all IPs"
+	@echo "  make all      : compile all IPs sequentially"
+	@echo "  make all -j N : compile all IPs in parallel using N jobs"
+	@echo "  make clean    : delete all generated IPs"
+	@echo "  make link     : create symbolic links to the IPs in the directory $(DART_IP_PATH)"
