@@ -4,18 +4,17 @@
 #include <unistd.h>
 #include "fred_lib.h"
 
+typedef uint64_t data_t;
+
 // make sure these constants match with the hw design
-#define  BLOCK_SIZE_BYTE (10 * 1024)
-#define  BLOCK_SIZE_DT (BLOCK_SIZE_BYTE / sizeof(uint32_t))
+#define BUFF_SIZE 1024
+#define BUFF_SIZE_BYTE (sizeof(data_t) * 1024)
 
-// uint32_t mem_in[BLOCK_SIZE_DT];
-// uint32_t mem_out[BLOCK_SIZE_DT];
+data_t *mem_in, *mem_out;
 
-uint32_t *mem_in, *mem_out;
-
-void init_vect(uint32_t *base, int value)
+void init_vect(data_t *base, int value)
 {
-	for (unsigned int i = 0; i < BLOCK_SIZE_DT; ++i) {
+	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
 		base = value + i;
 		base++;
 	}
@@ -24,26 +23,19 @@ void init_vect(uint32_t *base, int value)
 void print_vect(unsigned int base_idx, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		//std::cout << mem_in[base_idx + i] << "\t" << mem_out[base_idx + i] << "\n";
 		printf("%d\t%d\n",i,mem_out[i]);
 	}
 	printf("\n");
-	//std::cout << std::endl;
 }
 
 int main (int argc, char **argv)
 {
-	//std::cout << " starting memcpy \n";
 	printf(" starting memcpy \n");
 	int retval, error_code;
 
-
-	
 	struct fred_data *fred;
 	struct fred_hw_task *hw_memcpy;
     
-	//sw_task_init(&fred);
-
 	retval = fred_init(&fred);
 	if (retval) {
 		printf("fred_init failed \n");
@@ -56,10 +48,6 @@ int main (int argc, char **argv)
 		printf("fred_bind failed \n");
 		error_code = 1;
 	}		
-
-	// uint64_t *hw_memcpy_buff_in0;
-	// // this buffer is not actually used
-	// uint64_t *hw_memcpy_buff_out0;
 
 	mem_out = fred_map_buff(fred, hw_memcpy, 0);
 	if (mem_out) {
@@ -74,12 +62,9 @@ int main (int argc, char **argv)
 
 	// set the memcpy parameters (dest, source)
 	//init_vect(mem_in, 0);
-	for (unsigned int i = 0; i < BLOCK_SIZE_DT; ++i) {
-		*(mem_in+i) = i;
-		//base++;
+	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
+		*(mem_in+i) = (data_t)i;
 	}
-	// *(hw_memcpy_buff_in0 + 0) = (uint64_t) mem_out;
-	// *(hw_memcpy_buff_in0 + 1) = (uint64_t) mem_in;
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_memcpy);
@@ -89,20 +74,17 @@ int main (int argc, char **argv)
 	}		
 
 	//validate
-	int error_code = memcmp(mem_in,mem_out, BLOCK_SIZE_BYTE);
+	int error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
 	if (error_code !=0){
-		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
 		print_vect(0, 10);
 	}else{
-		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
 
 	//cleanup and finish
 	fred_free(fred);
 
-	//std::cout << "Fred finished\n";
 	printf("Fred finished\n");
 
 	return(error_code);

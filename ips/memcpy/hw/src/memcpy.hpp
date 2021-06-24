@@ -18,9 +18,9 @@
 // Export for test bench
 static const args_t MODULE_ID = 1;
 
-const unsigned int BLOCK_SIZE_BYTE = (10 * 1024);
-const unsigned int BLOCK_SIZE_DT = (BLOCK_SIZE_BYTE / sizeof(data_t));
+const unsigned int BUFF_SIZE = 1024;
+const unsigned int BUFF_SIZE_BYTE = (sizeof(data_t) * 1024);
 
-void memcpy(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
+void memcpy(volatile data_t *mem_in, volatile data_t *mem_out);
 
 #endif /* memcpy_H */
