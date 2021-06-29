@@ -8,18 +8,20 @@
 #define  ARRAY_SIZE (1024)
 #define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(uint32_t))
 
-uint32_t *A_in, *B_in, *C_out;
+typedef uint32_t data_t;
+
+data_t *A_in, *B_in, *C_out;
 
 const int hw_id = 100;
 
-void init_vect(uint32_t * base, int value)
+void init_vect(data_t * base, data_t value)
 {
 	for (unsigned int i = 0; i < ARRAY_SIZE; ++i) {
 		base[i] = value;
 	}
 }
 
-void print_vect(uint32_t *base, unsigned int size)
+void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
 		//std::cout << mem_in[base_idx + i] << "\t" << mem_out[base_idx + i] << "\n";
@@ -29,7 +31,7 @@ void print_vect(uint32_t *base, unsigned int size)
 	//std::cout << std::endl;
 }
 
-uint32_t check_output(uint32_t *base, unsigned int size, unsigned int expected_value)
+uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 {
 	uint32_t sum=0;
 	for (unsigned int i = 0; i < size; ++i) {
@@ -64,10 +66,6 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}	
 
-	uint64_t *hw_vsum_buff_in0;
-	// this buffer is not actually used
-	uint64_t *hw_vsum_buff_out0;
-
 	C_out = fred_map_buff(fred, hw_vsum, 0);
 	if (!C_out) {
 		printf("fred_map_buff failed on buff 0 for C_out\n");
@@ -99,6 +97,11 @@ int main (int argc, char **argv)
 	if (check_output(C_out, ARRAY_SIZE,2*1) != 1){
 		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
+		printf("Content of A[0:9]:\n");
+		print_vect(A_in, 10);
+		printf("Content of B[0:9]:\n");
+		print_vect(B_in, 10);
+		printf("Content of C[0:9]:\n");
 		print_vect(C_out, 10);
 		error_code = 1;
 	}else{
