@@ -12,8 +12,13 @@ The columns refer to the existance of software example, the IP hardware descript
 
 | IP name                                      | sw ex. | hw lang | tb | FPGA |
 |----------------------------------------------|--------|---------|----|------|
-| [FIR](ips/fir/readme.md)                     |    N   |   cpp   | Y  |  N   |
-| [memcpy](ips/memcpy/readme.md)               |    N   |   cpp   | Y  |  N   |
+| [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
+| [memcpy](ips/memcpy/readme.md)               |    Y   |   cpp   | Y  |  Y   |
+| [sum_vec](ips/sum_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
+| [sub_vec](ips/sub_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
+| [mul_vec](ips/mul_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
+| [nor_vec](ips/nor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
+| [xor_vec](ips/xor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [amalthea_prem](ips/amalthea_prem/readme.md) |    N   |   vhd   | Y  |  N   |
 | [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
 | mat_mult                                     |        |         |    |      |
