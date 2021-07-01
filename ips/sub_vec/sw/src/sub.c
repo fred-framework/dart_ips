@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include "fred_lib.h"
 
+typedef uint64_t data_t;
+
 // make sure these constants match with the hw design
 #define  ARRAY_SIZE (1024)
-#define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(uint32_t))
-
-typedef uint32_t data_t;
+#define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(data_t))
 
 data_t *A_in, *B_in, *C_out;
 

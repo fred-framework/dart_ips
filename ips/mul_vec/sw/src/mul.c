@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include "fred_lib.h"
 
+typedef uint64_t data_t;
+
 // make sure these constants match with the hw design
 #define  ARRAY_SIZE (1024)
-#define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(uint32_t))
-
-typedef uint32_t data_t;
+#define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(data_t))
 
 data_t *A_in, *B_in, *C_out;
 
@@ -25,7 +25,7 @@ void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
 		//std::cout << mem_in[base_idx + i] << "\t" << mem_out[base_idx + i] << "\n";
-		printf("%d\t%d\n", i, base[i]);
+		printf("%d\t%ld\n", i, base[i]);
 	}
 	printf("\n");
 	//std::cout << std::endl;
@@ -33,7 +33,6 @@ void print_vect(data_t *base, unsigned int size)
 
 uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 {
-	uint32_t sum=0;
 	for (unsigned int i = 0; i < size; ++i) {
 		if (base[i] != expected_value)
 			return 0;

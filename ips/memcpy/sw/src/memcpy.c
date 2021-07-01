@@ -23,7 +23,7 @@ void init_vect(data_t *base, int value)
 void print_vect(unsigned int base_idx, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		printf("%d\t%d\n",i,mem_out[i]);
+		printf("%d\t%ld\n",i,mem_out[i]);
 	}
 	printf("\n");
 }
