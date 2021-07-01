@@ -74,7 +74,7 @@ int main (int argc, char **argv)
 	}		
 
 	//validate
-	int error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
+	error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
 	if (error_code !=0){
 		printf("Mismatch!\n");
 		print_vect(0, 10);
