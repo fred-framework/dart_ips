@@ -44,10 +44,10 @@ uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 int main (int argc, char **argv)
 {
 	//std::cout << " starting memcpy \n";
-	printf(" starting vector sum \n");
+	printf(" starting vector sub \n");
 
 	struct fred_data *fred;
-	struct fred_hw_task *hw_vsum;
+	struct fred_hw_task *hw_ip;
 	int retval;
 	int error_code = 0;
     
@@ -60,23 +60,23 @@ int main (int argc, char **argv)
 	}	
 	
 	// Bind with HW-memcpy having hw-id 100
-	retval = fred_bind(fred, &hw_vsum, hw_id);
+	retval = fred_bind(fred, &hw_ip, hw_id);
 	if (retval) {
 		printf("fred_bind failed for hw-task %u\n", hw_id);
 		error_code = 1;
 	}	
 
-	C_out = fred_map_buff(fred, hw_vsum, 0);
+	C_out = fred_map_buff(fred, hw_ip, 0);
 	if (!C_out) {
 		printf("fred_map_buff failed on buff 0 for C_out\n");
 		error_code = 1;
 	}	
-	A_in  = fred_map_buff(fred, hw_vsum, 1);
+	A_in  = fred_map_buff(fred, hw_ip, 1);
 	if (!A_in) {
 		printf("fred_map_buff failed on buff 1 for A_in\n");
 		error_code = 1;
 	}	
-	B_in  = fred_map_buff(fred, hw_vsum, 2);
+	B_in  = fred_map_buff(fred, hw_ip, 2);
 	if (!B_in) {
 		printf("fred_map_buff failed on buff 2 for B_in\n");
 		error_code = 1;
@@ -87,7 +87,7 @@ int main (int argc, char **argv)
 	init_vect(B_in, 1);
 
 	// Call fred IP
-	retval = fred_accel(fred, hw_vsum);
+	retval = fred_accel(fred, hw_ip);
 	if (retval) {
 		printf("fred_accel failed for hw-task %u\n", hw_id);
 		error_code = 1;
