@@ -15,16 +15,21 @@
 void prem(volatile data_t *mem_in, volatile data_t *mem_out)
 {
 	data_t count_input_val=0;
+	data_t i;
 
-	in_loop:for (int i = 0; i < IN_BUFF_SIZE; ++i) {
-		count_input_val += mem_in[i];
+	mem_rd_loop:for (i = 0; i < IN_BUFF_SIZE; ++i) {
+		#pragma HLS pipeline
+		count_input_val += (data_t)mem_in[i];
 	}
 
-	exec_loop:for (int i = 0; i < EXEC_SIZE; ++i) {
-		count_input_val += i;
+	// mem_in[0] is added to avoid optime the exec_loop
+	exec_loop:for (i = 0; i < EXEC_SIZE; ++i) {
+		#pragma HLS pipeline
+		count_input_val += (data_t)mem_in[0] + i;
 	}
 
-	out_loop:for (int i = 0; i < OUT_BUFF_SIZE; ++i) {
-		mem_out[i] = count_input_val + i;
+	mem_wr_loop:for (i = 0; i < OUT_BUFF_SIZE; ++i) {
+		#pragma HLS pipeline
+		mem_out[i] = (data_t)count_input_val + i;
 	}
 }
