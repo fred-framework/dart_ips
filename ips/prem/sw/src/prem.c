@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include "fred_lib.h"
 
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+
 typedef uint64_t data_t;
 
 // make sure these constants match with the hw design
@@ -15,15 +17,16 @@ typedef uint64_t data_t;
 
 data_t *mem_in, *mem_out;
 
-void init_vect(data_t *base, int value)
+const int hw_id = 100;
+
+void init_vect(data_t* base_idx, data_t value, unsigned int size)
 {
-	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
-		base = value + i;
-		base++;
+	for (unsigned int i = 0; i < size; ++i) {
+		base_idx[i] = value + i;
 	}
 }
 
-void print_vect(data_t * base, unsigned int size)
+void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
 		printf("%d\t%ld\n",i,base[i]);
@@ -50,54 +53,64 @@ uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 int main (int argc, char **argv)
 {
 	printf(" starting prem \n");
-	int retval, error_code;
 
 	struct fred_data *fred;
-	struct fred_hw_task *hw_prem;
+	struct fred_hw_task *hw_ip;
+	int retval;
+	int error_code = 0;
+	data_t count_input_val=0;
     
 	retval = fred_init(&fred);
 	if (retval) {
 		printf("fred_init failed \n");
 		error_code = 1;
-	}		
+	}
 	
 	// Bind with HW-prem having hw-id 100
-	retval = fred_bind(fred, &hw_prem, 100);
+	retval = fred_bind(fred, &hw_ip, hw_id);
 	if (retval) {
 		printf("fred_bind failed \n");
 		error_code = 1;
-	}		
-
-	mem_out = fred_map_buff(fred, hw_prem, 0);
-	if (mem_out) {
-		printf("fred_map_buff failed on buff 0 for mem_out\n");
-		error_code = 1;
-	}		
-	mem_in = fred_map_buff(fred, hw_prem, 1);
-	if (mem_in) {
-		printf("fred_map_buff failed on buff 1 for mem_in\n");
-		error_code = 1;
-	}		
-
-	// set the prem parameters (dest, source)
-	//init_vect(mem_in, 0);
-	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
-		*(mem_in+i) = (data_t)i;
 	}
 
+	mem_in = fred_map_buff(fred, hw_ip, 0);
+	if (mem_in) {
+		printf("fred_map_buff failed on buff 0 for mem_in\n");
+		error_code = 1;
+	}
+	mem_out = fred_map_buff(fred, hw_ip, 1);
+	if (mem_out) {
+		printf("fred_map_buff failed on buff 1 for mem_out\n");
+		error_code = 1;
+	}
+
+	// set input values
+	init_vect(mem_in, 0, IN_BUFF_SIZE);
+
 	// Call fred IP
-	retval = fred_accel(fred, hw_prem);
+	retval = fred_accel(fred, hw_ip);
 	if (retval) {
 		printf("fred_accel failed \n");
 		error_code = 1;
 	}		
 
-	//validate
-	error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
-	if (error_code !=0){
+	// calculate the base for the expected value
+	for (int i = 0; i < IN_BUFF_SIZE; ++i) {
+		count_input_val += mem_in[i];
+	}
+	for (int i = 0; i < EXEC_SIZE; ++i) {
+		count_input_val += i;
+	}	
+
+	if (check_output(mem_out, OUT_BUFF_SIZE, count_input_val) != 1){
 		printf("Mismatch!\n");
-		print_vect(0, 10);
+		printf("Input Content [0:9]:\n");
+		print_vect(mem_in, MIN(10,IN_BUFF_SIZE));
+		printf("Output Content [0:9]:\n");
+		print_vect(mem_out, MIN(10,OUT_BUFF_SIZE));
+		error_code = 1;
 	}else{
+		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
 

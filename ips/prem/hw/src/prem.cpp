@@ -16,15 +16,15 @@ void prem(volatile data_t *mem_in, volatile data_t *mem_out)
 {
 	data_t count_input_val=0;
 
-	for (int i = 0; i < IN_BUFF_SIZE; ++i) {
+	in_loop:for (int i = 0; i < IN_BUFF_SIZE; ++i) {
 		count_input_val += mem_in[i];
 	}
 
-	for (int i = 0; i < EXEC_SIZE; ++i) {
-		count_input_val += 1;
+	exec_loop:for (int i = 0; i < EXEC_SIZE; ++i) {
+		count_input_val += i;
 	}
 
-	for (int i = 0; i < OUT_BUFF_SIZE; ++i) {
+	out_loop:for (int i = 0; i < OUT_BUFF_SIZE; ++i) {
 		mem_out[i] = count_input_val + i;
 	}
 }

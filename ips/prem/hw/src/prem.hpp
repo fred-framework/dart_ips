@@ -18,11 +18,16 @@
 // Export for test bench
 static const args_t MODULE_ID = 1;
 
-const uint32_t IN_BUFF_SIZE =  64;
-const uint32_t IN_BUFF_SIZE_BYTE = (sizeof(data_t) * IN_BUFF_SIZE);
-const uint32_t EXEC_SIZE = 1024;
-const uint32_t OUT_BUFF_SIZE = 64;
-const uint32_t OUT_BUFF_SIZE_BYTE = (sizeof(data_t) * OUT_BUFF_SIZE);
+#define IN_BUFF_SIZE 64
+#define IN_BUFF_SIZE_BYTE (sizeof(data_t) * IN_BUFF_SIZE)
+#define OUT_BUFF_SIZE 64
+#define OUT_BUFF_SIZE_BYTE (sizeof(data_t) * OUT_BUFF_SIZE)
+// the input and output time does not count in the prem model
+#define EXEC_SIZE 1024-IN_BUFF_SIZE-OUT_BUFF_SIZE
+
+#if defined EXEC_SIZE <= 0
+#error "EXEC_SIZE must be positive"
+#endif
 
 void prem(volatile data_t *mem_in, volatile data_t *mem_out);
 
