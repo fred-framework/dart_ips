@@ -33,7 +33,6 @@ void print_vect(data_t *base, unsigned int size)
 
 uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 {
-	uint32_t sum=0;
 	for (unsigned int i = 0; i < size; ++i) {
 		if (base[i] != expected_value)
 			return 0;
@@ -57,30 +56,30 @@ int main (int argc, char **argv)
 	if (retval) {
 		printf("fred_init failed for hw-task %u\n", hw_id);
 		error_code = 1;
-	}	
+	}
 	
 	// Bind with HW-memcpy having hw-id 100
 	retval = fred_bind(fred, &hw_ip, hw_id);
 	if (retval) {
 		printf("fred_bind failed for hw-task %u\n", hw_id);
 		error_code = 1;
-	}	
+	}
 
 	C_out = fred_map_buff(fred, hw_ip, 0);
 	if (!C_out) {
 		printf("fred_map_buff failed on buff 0 for C_out\n");
 		error_code = 1;
-	}	
+	}
 	A_in  = fred_map_buff(fred, hw_ip, 1);
 	if (!A_in) {
 		printf("fred_map_buff failed on buff 1 for A_in\n");
 		error_code = 1;
-	}	
+	}
 	B_in  = fred_map_buff(fred, hw_ip, 2);
 	if (!B_in) {
 		printf("fred_map_buff failed on buff 2 for B_in\n");
 		error_code = 1;
-	}	
+	}
 
 	// set the memcpy parameters (dest, source)
 	init_vect(A_in, 0);

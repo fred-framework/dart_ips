@@ -21,7 +21,6 @@ void print_vect(data_t * base_idx, unsigned int size)
 
 uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 {
-	uint32_t sum=0;
 	for (unsigned int i = 0; i < size; ++i) {
 		if (base[i] != expected_value)
 			return 0;
@@ -65,10 +64,8 @@ int main()
 	}else{
 		std::cout << "Match!\n";
 	}
-
 	std::cout << "Fred finished\n";
 
 	return(error_code);
-
 }
 
