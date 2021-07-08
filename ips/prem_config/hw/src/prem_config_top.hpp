@@ -20,6 +20,6 @@ typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
 const uint32_t AXIM_MAX_DATA_SIZE = 32;
 
-void prem__config_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
+void prem_config_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 #endif /* SLOTS_HPP */

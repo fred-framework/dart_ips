@@ -11,7 +11,7 @@ set sim 0
 open_project -reset $prj_name
 
 # HW-task files
-add_files src/prem_top.cpp
+add_files src/prem_config_top.cpp
 add_files src/prem.cpp
 add_file -tb tb/tb.cpp
 

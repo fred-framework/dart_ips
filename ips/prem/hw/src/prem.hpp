@@ -15,8 +15,6 @@
 
 #include "prem_top.hpp"
 
-//#include "parameters.hpp"
-
 #define IN_MEM_SIZE 10
 #define OUT_MEM_SIZE 13
 #define EXEC_CYCLES 10000
@@ -25,10 +23,6 @@
 #define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
 #define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
-
-#if defined EXEC_SIZE <= 0
-#error "EXEC_SIZE must be positive"
-#endif
 
 void prem(volatile data_t *mem_in, volatile data_t *mem_out);
 

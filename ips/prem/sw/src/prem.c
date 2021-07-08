@@ -8,19 +8,16 @@
 
 typedef uint64_t data_t;
 
-// make sure these constants match with the hw design
-#define IN_MEM_SIZE 10
-#define OUT_MEM_SIZE 13
-#define EXEC_CYCLES 10000
+// change here to set up the # in/out and execution cycles of the hw module
+#define IN_MEM_SIZE 16
+#define OUT_MEM_SIZE 16
+#define EXEC_CYCLES 128
 
+// do not change this part
 #define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
 #define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
 #define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
-
-#if defined EXEC_SIZE <= 0
-#error "EXEC_SIZE must be positive"
-#endif
 
 data_t *mem_in, *mem_out;
 
@@ -111,15 +108,16 @@ int main (int argc, char **argv)
 
 	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
 		printf("Mismatch!\n");
-		printf("Input Content [0:9]:\n");
-		print_vect(mem_in, MIN(10,IN_MEM_SIZE));
-		printf("Output Content [0:9]:\n");
-		print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 		error_code = 1;
 	}else{
 		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
+	printf("Input Content [0:9]:\n");
+	print_vect(&(mem_in[3]), MIN(10,IN_MEM_SIZE));
+	printf("Expected Initial value at the output : %d \n", count_input_val);
+	printf("Output Content [0:9]:\n");
+	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 
 	//cleanup and finish
 	fred_free(fred);

@@ -8,12 +8,16 @@
 
 typedef uint64_t data_t;
 
-// make sure these constants match with the hw design
-#define IN_BUFF_SIZE 64
-#define IN_BUFF_SIZE_BYTE (sizeof(data_t) * IN_BUFF_SIZE)
-#define EXEC_SIZE 1024
-#define OUT_BUFF_SIZE 64
-#define OUT_BUFF_SIZE_BYTE (sizeof(data_t) * OUT_BUFF_SIZE)
+// change here to set up the # in/out and execution cycles of the hw module
+#define IN_MEM_SIZE 16
+#define OUT_MEM_SIZE 16
+#define EXEC_CYCLES 128
+
+// do not change this part
+#define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
+#define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
+// the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
+#define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
 
 data_t *mem_in, *mem_out;
 
@@ -85,10 +89,10 @@ int main (int argc, char **argv)
 	}
 
 	// set input values
-	mem_in[0]=64;
-	mem_in[1]=1024;
-	mem_in[2]=64;
-	init_vect(&(mem_in[3]), 0, IN_BUFF_SIZE);
+	mem_in[0]=IN_MEM_SIZE;
+	mem_in[1]=EXEC_SIZE;
+	mem_in[2]=OUT_MEM_SIZE;
+	init_vect(&(mem_in[3]), 0, IN_MEM_SIZE);
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_ip);
@@ -98,24 +102,25 @@ int main (int argc, char **argv)
 	}		
 
 	// calculate the base for the expected value
-	for (int i = 3; i < IN_BUFF_SIZE+3; ++i) {
+	for (int i = 3; i < IN_MEM_SIZE+3; ++i) {
 		count_input_val += mem_in[i];
 	}
 	for (int i = 0; i < EXEC_SIZE; ++i) {
 		count_input_val += i;
 	}	
 
-	if (check_output(mem_out, OUT_BUFF_SIZE, count_input_val) != 1){
+	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
 		printf("Mismatch!\n");
-		printf("Input Content [0:9]:\n");
-		print_vect(&(mem_in[3]), MIN(10,IN_BUFF_SIZE));
-		printf("Output Content [0:9]:\n");
-		print_vect(mem_out, MIN(10,OUT_BUFF_SIZE));
 		error_code = 1;
 	}else{
 		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
+	printf("Input Content [0:9]:\n");
+	print_vect(&(mem_in[3]), MIN(10,IN_MEM_SIZE));
+	printf("Expected Initial value at the output : %d \n", count_input_val);
+	printf("Output Content [0:9]:\n");
+	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 
 	//cleanup and finish
 	fred_free(fred);

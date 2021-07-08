@@ -19,7 +19,6 @@ static const uint8_t ARGS_SIZE = 8;
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
 #define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
 void prem_config_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
-void prem(volatile data_t *mem_in, volatile data_t *mem_out);
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
@@ -62,7 +61,7 @@ int main()
 	int error_code = 0;
 
 	data_t mem_in[IN_MEM_SIZE];
-	data_t mem_out[OUT_MEM_SIZE];	
+	data_t mem_out[OUT_MEM_SIZE];
 
 	// checking configuration
 	if (EXEC_SIZE <= 0){
@@ -112,7 +111,7 @@ int main()
 	std::cout << "Output Content [0:9]:\n";
 	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 
-	std::cout << "Fred finished\n";
+	std::cout << "TB finished\n";
 
 	return(error_code);
 }
