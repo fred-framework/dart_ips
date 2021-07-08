@@ -70,7 +70,7 @@ int main()
 
 	// C/RTL cosim requires at least two executions of the design under test
 	prem_top(&id_out, args, mem_in, mem_out);
-	prem_top(&id_out, args, mem_in, mem_out);
+	//prem_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the base for the expected value
 	for (int i = 0; i < IN_MEM_SIZE; ++i) {
@@ -83,14 +83,17 @@ int main()
 	//validate
 	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
 		std::cout << "Mismatch!\n";
-		std::cout << "Input Content [0:9]:\n";
-		print_vect(mem_in, MIN(10,IN_MEM_SIZE));
-		std::cout << "Output Content [0:9]:\n";
-		print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 		error_code = 1;
 	}else{
 		std::cout << "Match!\n";
 	}
+	std::cout << "Input Content [0:9]:\n";
+	print_vect(mem_in, MIN(10,IN_MEM_SIZE));
+	std::cout << "Expected Initial value at the output :\n";
+	std::cout << count_input_val << std::endl;
+	std::cout << "Output Content [0:9]:\n";
+	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
+
 	std::cout << "Fred finished\n";
 
 	return(error_code);

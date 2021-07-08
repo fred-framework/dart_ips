@@ -72,7 +72,7 @@ int main()
 	init_vect(&(mem_in[3]), 0, IN_MEM_SIZE);
 
 	prem_config_top(&id_out, args, mem_in, mem_out);
-	prem_config_top(&id_out, args, mem_in, mem_out);
+	//prem_config_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the base for the expected value
 	for (int i = 3; i < IN_MEM_SIZE+3; ++i) {
