@@ -2,26 +2,24 @@
 #include <iostream>
 #include <cstring>
 
-#define IN_MEM_SIZE 1024
-#define OUT_MEM_SIZE 1024
-#define EXEC_CYCLES 10000
-
-#define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
-#define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
-// the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
-#define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
-
-#if defined EXEC_SIZE <= 0
-#error "EXEC_SIZE must be positive"
-#endif
-
+// make sure these parameters match the same used in the hw module
+const uint32_t AXIM_MAX_DATA_SIZE = 32;
 typedef uint32_t args_t;
 typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
 
+// change here to set up the # in/out and execution cycles of the hw module
+#define IN_MEM_SIZE 16
+#define OUT_MEM_SIZE 16
+#define EXEC_CYCLES 128
+
+// do not change this part
+#define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
+#define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
+// the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
+#define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
 void prem_config_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 void prem(volatile data_t *mem_in, volatile data_t *mem_out);
-
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
@@ -66,12 +64,30 @@ int main()
 	data_t mem_in[IN_MEM_SIZE];
 	data_t mem_out[OUT_MEM_SIZE];	
 
+	// checking configuration
+	if (EXEC_SIZE <= 0){
+		std::cout << "EXEC_SIZE must be positive\n";
+		return 1;
+	}
+
+	if (AXIM_MAX_DATA_SIZE-(IN_MEM_SIZE +3) <= 0){
+		std::cout << "IN_MEM_SIZE is too large for the current hw FIFO size\n";
+		return 1;
+	}
+
+	if (AXIM_MAX_DATA_SIZE-OUT_MEM_SIZE <= 0){
+		std::cout << "OUT_MEM_SIZE is too large for the current hw FIFO size\n";
+		return 1;
+	}
+
+	// set the hw configuration and the input vector
 	mem_in[0]=IN_MEM_SIZE;
 	mem_in[1]=EXEC_SIZE;
 	mem_in[2]=OUT_MEM_SIZE;
 	init_vect(&(mem_in[3]), 0, IN_MEM_SIZE);
 
 	prem_config_top(&id_out, args, mem_in, mem_out);
+	// uncomment if you want to simulate 2 flows
 	//prem_config_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the base for the expected value
