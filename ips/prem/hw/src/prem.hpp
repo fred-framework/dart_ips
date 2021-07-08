@@ -21,10 +21,6 @@
 #define OUT_BUFF_SIZE 13
 #define EXEC_CYCLES 10000
 
-// const uint32_t IN_BUFF_SIZE = 10;
-// const uint32_t OUT_BUFF_SIZE = 13;
-// const uint32_t EXEC_CYCLES = 10000;
-
 #define IN_BUFF_SIZE_BYTE (sizeof(data_t) * IN_BUFF_SIZE)
 #define OUT_BUFF_SIZE_BYTE (sizeof(data_t) * OUT_BUFF_SIZE)
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline

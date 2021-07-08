@@ -68,11 +68,6 @@ int main()
 
 	init_vect(mem_in, 0, IN_BUFF_SIZE);
 
-	// Set hw accelerator args
-	// The base address is the memory array start address
-	args[0] = (args_t)0; // starting addr for the input
-	args[1] = (args_t)0; // starting addr for the output
-
 	prem_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the base for the expected value
