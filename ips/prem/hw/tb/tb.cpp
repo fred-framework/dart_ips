@@ -2,14 +2,14 @@
 #include <iostream>
 #include <cstring>
 
-#define IN_BUFF_SIZE 10
-#define OUT_BUFF_SIZE 13
+#define IN_MEM_SIZE 10
+#define OUT_MEM_SIZE 13
 #define EXEC_CYCLES 10000
 
-#define IN_BUFF_SIZE_BYTE (sizeof(data_t) * IN_BUFF_SIZE)
-#define OUT_BUFF_SIZE_BYTE (sizeof(data_t) * OUT_BUFF_SIZE)
+#define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
+#define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
-#define EXEC_SIZE EXEC_CYCLES-30-IN_BUFF_SIZE-OUT_BUFF_SIZE
+#define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
 
 #if defined EXEC_SIZE <= 0
 #error "EXEC_SIZE must be positive"
@@ -63,15 +63,17 @@ int main()
 	args_t args[ARGS_SIZE];
 	int error_code = 0;
 
-	data_t mem_in[IN_BUFF_SIZE];
-	data_t mem_out[OUT_BUFF_SIZE];	
+	data_t mem_in[IN_MEM_SIZE];
+	data_t mem_out[OUT_MEM_SIZE];
 
-	init_vect(mem_in, 0, IN_BUFF_SIZE);
+	init_vect(mem_in, 0, IN_MEM_SIZE);
 
+	// C/RTL cosim requires at least two executions of the design under test
+	prem_top(&id_out, args, mem_in, mem_out);
 	prem_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the base for the expected value
-	for (int i = 0; i < IN_BUFF_SIZE; ++i) {
+	for (int i = 0; i < IN_MEM_SIZE; ++i) {
 		count_input_val += mem_in[i];
 	}
 	for (int i = 0; i < EXEC_SIZE; ++i) {
@@ -79,12 +81,12 @@ int main()
 	}
 
 	//validate
-	if (check_output(mem_out, OUT_BUFF_SIZE, count_input_val) != 1){
+	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
 		std::cout << "Mismatch!\n";
 		std::cout << "Input Content [0:9]:\n";
-		print_vect(mem_in, MIN(10,IN_BUFF_SIZE));
+		print_vect(mem_in, MIN(10,IN_MEM_SIZE));
 		std::cout << "Output Content [0:9]:\n";
-		print_vect(mem_out, MIN(10,OUT_BUFF_SIZE));
+		print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
 		error_code = 1;
 	}else{
 		std::cout << "Match!\n";
