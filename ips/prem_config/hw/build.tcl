@@ -2,7 +2,7 @@
 # HW-task
 set num_slots 1
 set prj_name "prem_config"
-set top_name "prem_top"
+set top_name "prem_config_top"
 set device {xc7z020clg400-1}
 set period 10
 #set sim to 1 to run simulation and synthesis, 0 to run only the synthesis
