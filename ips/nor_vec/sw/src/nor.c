@@ -24,11 +24,9 @@ void init_vect(data_t * base, data_t value)
 void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		//std::cout << mem_in[base_idx + i] << "\t" << mem_out[base_idx + i] << "\n";
 		printf("%d\t%d\n", i, base[i]);
 	}
 	printf("\n");
-	//std::cout << std::endl;
 }
 
 uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
@@ -43,7 +41,6 @@ uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
 
 int main (int argc, char **argv)
 {
-	//std::cout << " starting memcpy \n";
 	printf(" starting vector nor \n");
 
 	struct fred_data *fred;
@@ -51,8 +48,6 @@ int main (int argc, char **argv)
 	int retval;
 	int error_code = 0;
     
-	//sw_task_init(&fred);
-
 	retval = fred_init(&fred);
 	if (retval) {
 		printf("fred_init failed for hw-task %u\n", hw_id);
@@ -95,24 +90,21 @@ int main (int argc, char **argv)
 
 	//validate
 	if (check_output(C_out, ARRAY_SIZE,~(2|1)) != 1){
-		//std::cout << "Mismatch!\n";
 		printf("Mismatch!\n");
-		printf("Content of A[0:9]:\n");
-		print_vect(A_in, 10);
-		printf("Content of B[0:9]:\n");
-		print_vect(B_in, 10);
-		printf("Content of C[0:9]:\n");
-		print_vect(C_out, 10);
 		error_code = 1;
 	}else{
 		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
+	printf("Content of A[0:9]:\n");
+	print_vect(A_in, 10);
+	printf("Content of B[0:9]:\n");
+	print_vect(B_in, 10);
+	printf("Content of C[0:9]:\n");
+	print_vect(C_out, 10);
 
 	//cleanup and finish
 	fred_free(fred);
-
-	//std::cout << "Fred finished\n";
 	printf("Fred finished\n");
 
 	return(error_code);
