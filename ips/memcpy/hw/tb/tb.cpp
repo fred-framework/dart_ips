@@ -41,8 +41,8 @@ int main()
 
 	// Set hw accelerator args
 	// The base address is the memory array start address
-	//args[0] = (args_t)((data_t)&mem_out[a_idx]);
-	//args[1] = (args_t)((data_t)&mem_in[a_idx]);
+	args[0] = (args_t)0;
+	args[1] = (args_t)0;
 
 	memcpy_top(&id_out, args, mem_in, mem_out);
 

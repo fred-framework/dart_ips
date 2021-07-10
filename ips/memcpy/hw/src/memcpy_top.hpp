@@ -18,6 +18,7 @@
 typedef uint32_t args_t;
 typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
+const uint32_t AXIM_MAX_DATA_SIZE = 1024;
 
 void memcpy_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
