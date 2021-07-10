@@ -18,12 +18,12 @@ void memcpy(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatil
 	data_t temp;
 
 	*id = MODULE_ID;
-	args_t in_addr = args[0];
-	args_t out_addr = args[1];
+	data_t *data_out = (data_t *)&mem_out[args[0] / sizeof (data_t)];
+	data_t *data_in = (data_t *)&mem_in[args[1] / sizeof (data_t)];
 
 	for (int i = 0; i < BUFF_SIZE; ++i) {
 		#pragma HLS PIPELINE
-		temp = *(mem_in + i + (in_addr / sizeof(data_t)));
-		*(mem_out + i + (out_addr / sizeof(data_t))) = temp;
+		temp = data_in[i];
+		data_out[i] = temp;
 	}
 }
