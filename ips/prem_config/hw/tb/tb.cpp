@@ -60,7 +60,7 @@ int main()
 	args_t args[ARGS_SIZE];
 	int error_code = 0;
 
-	data_t mem_in[IN_MEM_SIZE];
+	data_t mem_in[IN_MEM_SIZE+3];
 	data_t mem_out[OUT_MEM_SIZE];
 
 	// checking configuration
@@ -78,6 +78,11 @@ int main()
 		std::cout << "OUT_MEM_SIZE is too large for the current hw FIFO size\n";
 		return 1;
 	}
+
+	// Set hw accelerator args
+	// The base address is the memory array start address
+	args[0] = (args_t)0;
+	args[1] = (args_t)0;
 
 	// set the hw configuration and the input vector
 	mem_in[0]=IN_MEM_SIZE;

@@ -27,7 +27,7 @@ void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile 
 		count_input_val += data_in[i];
 	}
 
-	// mem_in[0] is added to avoid optimize the exec_loop
+	// mem_in[0] is added to avoid optimizing the exec_loop
 	exec_loop:for (i = 0; i < EXEC_SIZE; ++i) {
 		#pragma HLS pipeline
 		count_input_val += data_in[0] + i;

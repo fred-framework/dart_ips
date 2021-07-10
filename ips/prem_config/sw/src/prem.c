@@ -45,11 +45,12 @@ void print_vect(data_t *base, unsigned int size)
 // 1+2+3+...+10+1000 + 1 for position 1 of the output vector
 // 1+2+3+...+10+1000 + 2 for position 2 of the output vector
 // ...
-uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
+uint32_t check_output(data_t *base, unsigned int size, uint32_t expected_value)
 {
-	for (unsigned int i = 3; i < size+3; ++i) {
-		if (base[i] != (expected_value+i))
+	for (unsigned int i = 0; i < size; ++i) {
+		if ((uint32_t)base[i] != (expected_value+i)){
 			return 0;
+		}
 	}
 	return 1;
 }
@@ -62,14 +63,13 @@ int main (int argc, char **argv)
 	struct fred_hw_task *hw_ip;
 	int retval;
 	int error_code = 0;
-	data_t count_input_val=0;
+	uint32_t count_input_val=0;
     
 	retval = fred_init(&fred);
 	if (retval) {
 		printf("fred_init failed \n");
 		error_code = 1;
 	}
-	
 	// Bind with HW-prem having hw-id 100
 	retval = fred_bind(fred, &hw_ip, hw_id);
 	if (retval) {
@@ -94,6 +94,14 @@ int main (int argc, char **argv)
 	mem_in[2]=OUT_MEM_SIZE;
 	init_vect(&(mem_in[3]), 0, IN_MEM_SIZE);
 
+	// calculate the base for the expected value
+	for (int i = 3; i < IN_MEM_SIZE+3; ++i) {
+		count_input_val += mem_in[i];
+	}
+	for (int i = 0; i < EXEC_SIZE; ++i) {
+		count_input_val += mem_in[3] + i;
+	}	
+
 	// Call fred IP
 	retval = fred_accel(fred, hw_ip);
 	if (retval) {
@@ -101,30 +109,20 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}		
 
-	// calculate the base for the expected value
-	for (int i = 3; i < IN_MEM_SIZE+3; ++i) {
-		count_input_val += mem_in[i];
-	}
-	for (int i = 0; i < EXEC_SIZE; ++i) {
-		count_input_val += i;
-	}	
-
 	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
 		printf("Mismatch!\n");
 		error_code = 1;
 	}else{
-		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
 	printf("Input Content [0:9]:\n");
-	print_vect(&(mem_in[3]), MIN(10,IN_MEM_SIZE));
+	print_vect(&(mem_in[3]), MIN(16,IN_MEM_SIZE));
 	printf("Expected Initial value at the output : %d \n", count_input_val);
 	printf("Output Content [0:9]:\n");
-	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
+	print_vect(mem_out, MIN(16,OUT_MEM_SIZE));
 
 	//cleanup and finish
 	fred_free(fred);
-
 	printf("Fred finished\n");
 
 	return(error_code);
