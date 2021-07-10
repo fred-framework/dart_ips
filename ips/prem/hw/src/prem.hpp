@@ -24,8 +24,6 @@
 // the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
 #define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
 
-static const args_t MODULE_ID = 1;
-
 void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 #endif /* prem_H */

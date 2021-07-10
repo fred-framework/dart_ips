@@ -15,8 +15,6 @@
 
 #include "prem_config_top.hpp"
 
-static const args_t MODULE_ID = 1;
-
 void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 #endif /* prem_H */

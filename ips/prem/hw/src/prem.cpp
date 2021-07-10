@@ -17,7 +17,6 @@ void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile 
 	data_t count_input_val=0;
 	data_t i;
 
-	*id = MODULE_ID;
 	// the order of the args must be consistent w the order in the fred_bind function
 	data_t *data_in = (data_t *)&mem_in[args[0] / sizeof (data_t)];
 	data_t *data_out = (data_t *)&mem_out[args[1] / sizeof (data_t)];

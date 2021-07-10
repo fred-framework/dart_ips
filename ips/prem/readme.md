@@ -12,4 +12,4 @@ The user can configure the following constants to change the behavior of the IP:
 ## Authors
 
 - Alexandre Amory (July 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. This HLS design.
-- Francesco Restuccia (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. Initial design.
+- Francesco Restuccia (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. Initial design in VHDL.

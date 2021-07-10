@@ -19,11 +19,12 @@ The columns refer to the existance of software example, the IP hardware descript
 | [mul_vec](ips/mul_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [nor_vec](ips/nor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [xor_vec](ips/xor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
+| [prem](ips/prem/readme.md)                   |    Y   |   cpp   | Y  |  Y   |
+| [prem_config](ips/prem_config/readme.md)     |    Y   |   cpp   | Y  |  Y   |
 | [amalthea_prem](ips/amalthea_prem/readme.md) |    N   |   vhd   | Y  |  N   |
 | [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
 | mat_mult                                     |        |         |    |      |
 |                                              |        |         |    |      |
-
 
 ## Summary of Static Parts
 
@@ -31,6 +32,7 @@ The columns refer to the existance of software example, the IP hardware descript
 
 The following table summarizes the existing Static Parts and some of their features.
 The columns refer to the number of existing **reconfigurable regions (RR)** in the design, the number of IPs for DPR, and a brief description of its application. Click in the link to go to their respective documentations.
+**BE AWARE THAT THESE DESIGNS WERE NOT FULLY TESTED YET.**
 
 | IP name                                      | # RR | # cores | application |
 |----------------------------------------------|------|---------|-------------|
