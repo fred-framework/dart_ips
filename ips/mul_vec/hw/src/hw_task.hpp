@@ -22,14 +22,6 @@ typedef uint64_t data_t;
 
 static const uint8_t ARGS_SIZE = 8;
 
-//void hw_task_0(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 void mul_vec_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
-/*
-void hw_task_1(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
-void hw_task_2(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
-
-void hw_task_3(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
-*/
 #endif /* SLOTS_HPP */
-
