@@ -10,20 +10,17 @@ typedef uint64_t data_t;
 #define BUFF_SIZE 1024
 #define BUFF_SIZE_BYTE (sizeof(data_t) * 1024)
 
-data_t *mem_in, *mem_out;
-
-void init_vect(data_t *base, int value)
+void init_vect(data_t *base, int value, unsigned int size)
 {
-	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
-		base = value + i;
-		base++;
+	for (unsigned int i = 0; i < size; ++i) {
+		base[i] = (data_t)value + i;
 	}
 }
 
-void print_vect(unsigned int base_idx, unsigned int size)
+void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		printf("%d\t%ld\n",i,mem_out[i]);
+		printf("%d\t%ld\n", i, base[i]);
 	}
 	printf("\n");
 }
@@ -32,6 +29,8 @@ int main (int argc, char **argv)
 {
 	printf(" starting memcpy \n");
 	int retval, error_code;
+
+	data_t *mem_in, *mem_out;
 
 	struct fred_data *fred;
 	struct fred_hw_task *hw_memcpy;
@@ -61,10 +60,12 @@ int main (int argc, char **argv)
 	}		
 
 	// set the memcpy parameters (dest, source)
-	//init_vect(mem_in, 0);
+	init_vect(mem_in, 0,BUFF_SIZE);
+	/*
 	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
 		*(mem_in+i) = (data_t)i;
 	}
+	*/
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_memcpy);
@@ -77,11 +78,14 @@ int main (int argc, char **argv)
 	error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
 	if (error_code !=0){
 		printf("Mismatch!\n");
-		print_vect(0, 10);
 	}else{
 		printf("Match!\n");
 	}
 
+	printf("IN:\n");
+	print_vect(mem_in, 10);
+	printf("OUT:\n");
+	print_vect(mem_out, 10);
 	//cleanup and finish
 	fred_free(fred);
 

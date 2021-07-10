@@ -12,12 +12,18 @@
 
 #include "memcpy.hpp"
 
-void memcpy(volatile data_t *mem_in, volatile data_t *mem_out)
+void memcpy(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
 {
+	#pragma HLS DATAFLOW
 	data_t temp;
 
+	*id = MODULE_ID;
+	args_t in_addr = args[0];
+	args_t out_addr = args[1];
+
 	for (int i = 0; i < BUFF_SIZE; ++i) {
-		temp = mem_in[i];
-		mem_out[i] = temp;
+		#pragma HLS PIPELINE
+		temp = *(mem_in + i + (in_addr / sizeof(data_t)));
+		*(mem_out + i + (out_addr / sizeof(data_t))) = temp;
 	}
 }

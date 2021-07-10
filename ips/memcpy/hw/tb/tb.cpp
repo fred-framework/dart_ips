@@ -1,8 +1,15 @@
 
 #include <iostream>
 #include <cstring>
-#include "memcpy_top.hpp"
-#include "memcpy.hpp"
+
+typedef uint32_t args_t;
+typedef uint64_t data_t;
+static const uint8_t ARGS_SIZE = 8;
+
+const unsigned int BUFF_SIZE = 1024;
+const unsigned int BUFF_SIZE_BYTE = (sizeof(data_t) * 1024);
+
+void memcpy_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 data_t mem_in[BUFF_SIZE];
 data_t mem_out[BUFF_SIZE];
@@ -25,6 +32,7 @@ void print_vect(unsigned int base_idx, unsigned int size)
 int main()
 {
 	unsigned int a_idx = 0;
+	int error_code=0;
 
 	args_t id_out;
 	args_t args[ARGS_SIZE];
@@ -33,17 +41,19 @@ int main()
 
 	// Set hw accelerator args
 	// The base address is the memory array start address
-	args[0] = (args_t)((data_t)&mem_out[a_idx]);
-	args[1] = (args_t)((data_t)&mem_in[a_idx]);
+	//args[0] = (args_t)((data_t)&mem_out[a_idx]);
+	//args[1] = (args_t)((data_t)&mem_in[a_idx]);
 
 	memcpy_top(&id_out, args, mem_in, mem_out);
 
 	if (memcmp(mem_in,mem_out, BUFF_SIZE_BYTE) !=0){
 		printf("Mismatch!\n");
-		print_vect(0, 10);
-		return(1);
+		error_code = 1;
 	}
+
+	print_vect(0, 10);
+
 	printf("Match!\n");
-	return 0;
+	return error_code ;
 }
 
