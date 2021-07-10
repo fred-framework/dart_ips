@@ -78,12 +78,12 @@ int main (int argc, char **argv)
 	}
 
 	mem_in = fred_map_buff(fred, hw_ip, 0);
-	if (mem_in) {
+	if (!mem_in) {
 		printf("fred_map_buff failed on buff 0 for mem_in\n");
 		error_code = 1;
 	}
 	mem_out = fred_map_buff(fred, hw_ip, 1);
-	if (mem_out) {
+	if (!mem_out) {
 		printf("fred_map_buff failed on buff 1 for mem_out\n");
 		error_code = 1;
 	}
