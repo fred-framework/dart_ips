@@ -39,40 +39,35 @@ int main (int argc, char **argv)
 	if (retval) {
 		printf("fred_init failed \n");
 		error_code = 1;
-	}		
+	}
 	
 	// Bind with HW-memcpy having hw-id 100
 	retval = fred_bind(fred, &hw_memcpy, 100);
 	if (retval) {
 		printf("fred_bind failed \n");
 		error_code = 1;
-	}		
+	}
 
 	mem_out = fred_map_buff(fred, hw_memcpy, 0);
-	if (mem_out) {
+	if (!mem_out) {
 		printf("fred_map_buff failed on buff 0 for mem_out\n");
 		error_code = 1;
-	}		
+	}
 	mem_in = fred_map_buff(fred, hw_memcpy, 1);
-	if (mem_in) {
+	if (!mem_in) {
 		printf("fred_map_buff failed on buff 1 for mem_in\n");
 		error_code = 1;
-	}		
+	}
 
 	// set the memcpy parameters (dest, source)
 	init_vect(mem_in, 0,BUFF_SIZE);
-	/*
-	for (unsigned int i = 0; i < BUFF_SIZE; ++i) {
-		*(mem_in+i) = (data_t)i;
-	}
-	*/
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_memcpy);
 	if (retval) {
 		printf("fred_accel failed \n");
 		error_code = 1;
-	}		
+	}
 
 	//validate
 	error_code = memcmp(mem_in,mem_out, BUFF_SIZE_BYTE);
