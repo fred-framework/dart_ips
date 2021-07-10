@@ -79,6 +79,11 @@ int main()
 		return 1;
 	}
 
+	// Set hw accelerator args
+	// The base address is the memory array start address
+	args[0] = (args_t)0;
+	args[1] = (args_t)0;
+
 	init_vect(mem_in, 0, IN_MEM_SIZE);
 
 	// C/RTL cosim requires at least two executions of the design under test

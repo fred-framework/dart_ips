@@ -26,5 +26,5 @@ void prem_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volat
 	#pragma HLS INTERFACE m_axi depth=AXIM_MAX_DATA_SIZE port=mem_out offset=slave bundle=mem_bus
 	#pragma HLS INTERFACE s_axilite port=mem_out bundle=ctrl_bus
 
-	prem(mem_in, mem_out);
+	prem(id, args, mem_in, mem_out);
 }

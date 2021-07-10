@@ -12,24 +12,29 @@
 
 #include "prem.hpp"
 
-void prem(volatile data_t *mem_in, volatile data_t *mem_out)
+void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
 {
 	data_t count_input_val=0;
 	data_t i;
 
+	*id = MODULE_ID;
+	// the order of the args must be consistent w the order in the fred_bind function
+	data_t *data_in = (data_t *)&mem_in[args[0] / sizeof (data_t)];
+	data_t *data_out = (data_t *)&mem_out[args[1] / sizeof (data_t)];
+
 	mem_rd_loop:for (i = 0; i < IN_MEM_SIZE; ++i) {
 		#pragma HLS pipeline
-		count_input_val += mem_in[i];
+		count_input_val += data_in[i];
 	}
 
 	// mem_in[0] is added to avoid optimize the exec_loop
 	exec_loop:for (i = 0; i < EXEC_SIZE; ++i) {
 		#pragma HLS pipeline
-		count_input_val += mem_in[0] + i;
+		count_input_val += data_in[0] + i;
 	}
 
 	mem_wr_loop:for (i = 0; i < OUT_MEM_SIZE; ++i) {
 		#pragma HLS pipeline
-		mem_out[i] = count_input_val + i;
+		data_out[i] = count_input_val + i;
 	}
 }
