@@ -23,10 +23,11 @@ void init_vect(data_t * base, data_t value)
 
 void print_vect(data_t *base, unsigned int size)
 {
+	printf("[ ");
 	for (unsigned int i = 0; i < size; ++i) {
-		printf("%d\t%ld\n", i, base[i]);
+			printf("%llu ", base[i]);
 	}
-	printf("\n");
+	printf("] \n");
 }
 
 uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
