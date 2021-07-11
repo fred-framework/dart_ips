@@ -32,7 +32,7 @@ The following report includes this IP and it considers the board PYNQ-Z1 (xc7z02
 |   Register as Latch        |    0 |     0 |    106400 |  0.00 |
 | F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
 | F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
-+----------------------------+------+-------+-----------+-------+
+
 
 ## Authors
 
