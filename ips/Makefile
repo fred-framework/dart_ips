@@ -8,7 +8,7 @@ SHELL=/bin/bash
 #$(info >>>>>>>>>>>>>>>)
 #$(info $$SUBDIRS is: ${SUBDIRS})
 #$(info <<<<<<<<<<<<<<<)
-SUBDIRS = memcpy mul_vec nor_vec sub_vec sum_vec xor_vec
+SUBDIRS = memcpy mul_vec nor_vec sub_vec sum_vec xor_vec prem prem_config
 
 ORIG_DIR = $(PWD)
 ifndef XILINX_VIVADO

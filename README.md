@@ -205,6 +205,20 @@ $ vivado -mode batch -source build.tcl
 The generated design is located in the *vivado* directory.
 The generated DCP file is located in the directory *static/static-name/vivado/proj-name/proj-name.runs/synth_1/proj-name_wrapper.dcp*.
 
+
+# Compiling all IPs at once
+
+There is a makefile to easy the task of compiling the IPs in the first time. To run it, execute the following steps:
+
+```
+$ cd dart_ips/ips
+$ make all -j 8
+$ make link 
+```
+
+This sequence compiles all IPs using 8 parallel jobs and it creates the symbolic links in the `DART_IP_PATH` environment variable. This
+ step is done only once. You have to repeate it only if the IP hardware descrition is changed.  
+
 # Authors
 
 - Alexandre Amory (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy.

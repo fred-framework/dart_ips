@@ -14,6 +14,26 @@ The first 3 words of the input of this IP represent:
 
 This way, the actual input data starts form the 4th position of the input vector.
 
+
+## Resource Usage
+
+The following report includes this IP and it considers the board PYNQ-Z1 (xc7z020clg400-1). 
+
+
+|          Site Type         | Used | Fixed | Available | Util% |
+|----------------------------|------|-------|-----------|-------|
+| Slice LUTs*                | 1566 |     0 |     53200 |  2.94 |
+|   LUT as Logic             | 1468 |     0 |     53200 |  2.76 |
+|   LUT as Memory            |   98 |     0 |     17400 |  0.56 |
+|     LUT as Distributed RAM |    0 |     0 |           |       |
+|     LUT as Shift Register  |   98 |     0 |           |       |
+| Slice Registers            | 2900 |     0 |    106400 |  2.73 |
+|   Register as Flip Flop    | 2900 |     0 |    106400 |  2.73 |
+|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
+| F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
+| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
++----------------------------+------+-------+-----------+-------+
+
 ## Authors
 
 - Alexandre Amory (July 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. This HLS design.
