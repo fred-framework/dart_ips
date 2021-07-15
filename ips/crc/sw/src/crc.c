@@ -23,7 +23,7 @@ void init_vect(data_t * base, data_t value)
 	}
 }
 
-void print_vect(data_t *base, unsigned int size)
+void print_vect(uint8_t *base, unsigned int size)
 {
 	printf("[ ");
 	for (unsigned int i = 0; i < size; ++i) {
