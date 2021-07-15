@@ -14,6 +14,7 @@ ips/sum_vec/hw/sum_vec*/**
 ips/sub_vec/hw/sub_vec*/**
 ips/nor_vec/hw/nor_vec*/**
 ips/xor_vec/hw/xor_vec*/**
+ips/crc/hw/crc*/**
 ips/prem*/hw/prem*/**
 
 #################################################
