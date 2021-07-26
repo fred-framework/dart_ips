@@ -1,4 +1,4 @@
-# AMALTHEA PREM IP
+# LeNet CNN
 
 This IP is used with the [AMALTHEA](https://projects.eclipse.org/projects/automotive.app4mc/downloads) design flow to mimic the behavior of a generic hardware accelerator. 
 

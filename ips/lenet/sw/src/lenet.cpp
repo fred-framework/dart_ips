@@ -81,10 +81,11 @@ void READ_MNIST_DATA(string filename, float* arr, float scale_min, float scale_m
 
 	}
 	else {
-		cout << "Failed to read MNIST DATA" << endl;
+		cout << "Failed to read MNIST DATA. File " << filename << " not found!" << endl;
+		cout << "The application must be run from the directory with 'MNIST_DATA' directory" << endl;
+		exit(1);
 	}
-
-
+	file.close();
 }
 
 void READ_MNIST_LABEL(string filename, int* label, int image_num, int one_hot)
@@ -119,13 +120,15 @@ void READ_MNIST_LABEL(string filename, int* label, int image_num, int one_hot)
 	}
 	else
 	{
-		cout << "Failed to read MNIST Label" << endl;
+		cout << "Failed to read MNIST Label. File " << filename << " not found!" << endl;
+		cout << "The application must be run from the directory with 'MNIST_DATA' directory" << endl;
+		exit(1);
 	}
-//	file.close();
+	file.close();
 }
 
 int main(int argc, char* argv[]){
-	printf("hello fred-lenet\r\n");
+	printf("hello lenet\r\n");
 
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
@@ -134,9 +137,9 @@ int main(int argc, char* argv[]){
 	int error_code = 0;
 
    // the cwd is mnist_hls/Vivado_hls/LeNet_hls/origin/csim/build
-	READ_MNIST_DATA("../../../../MNIST_DATA/t10k-images.idx3-ubyte",
+	READ_MNIST_DATA("./MNIST_DATA/t10k-images.idx3-ubyte",
 			MNIST_IMG,-1.0f, 1.0f, image_Move);
-	READ_MNIST_LABEL("../../../../MNIST_DATA/t10k-labels.idx1-ubyte",
+	READ_MNIST_LABEL("./MNIST_DATA/t10k-labels.idx1-ubyte",
 			MNIST_LABEL,image_Move,false);
 
 	retval = fred_init(&fred);
@@ -162,16 +165,6 @@ int main(int argc, char* argv[]){
         error_code = 1;
     }
 
-
-//	FILE *fin;
-//	if ((fin = fopen("tb_datain.dat","w+")) == NULL)
-//	{
-//	    printf("Error opening file!\n");
-//		exit(1);
-//	}
-
-	// uint8_t aux_uint8;
-	// int8_t aux_int8;
 	float aux_float;
 	int idx=0;
     int8_t *mem_in_int8_ptr  = (int8_t *)mem_in;
@@ -189,18 +182,6 @@ int main(int argc, char* argv[]){
 				}
 			}
 		}
-
-		// printf("FRED INPUT: \n");
-		// for(int batch=0; batch<image_Batch; batch++){
-		// 	printf("batch: %d\n", batch);
-		// 	for(int j=0; j<INPUT_WH; j++){
-		// 		for(int k=0; k<INPUT_WH; k++){
-		// 			fprintf(fin, "%02X %02X\n",  mem_in_int8_ptr[batch*MNIST_PAD_SIZE + j*INPUT_WH + k], mem_in[batch*MNIST_PAD_SIZE + j*INPUT_WH + k]);
-		// 		}
-		// 		fprintf(fin, "\n");
-		// 	}
-		// }
-		// fprintf(fin,"\n\n\n");
 
         // fred run -- fpga offloading
         retval = fred_accel(fred, hw_ip);
@@ -227,18 +208,13 @@ int main(int argc, char* argv[]){
 				printf("%0.3f ", result[index]);
 			}
 			cout << endl;
-			// for(int index=0; index<MNIST_LABEL_SIZE; index++){
-			// 	tmp = dst[batch*MNIST_LABEL_SIZE + index].data;
-			// 	printf("%d: %x ", batch*MNIST_LABEL_SIZE + index, tmp & 0xFF);
-			// }
-			// cout << endl;
 			if(MNIST_LABEL[i*image_Batch+batch] == max_id){
                 correct ++;
             }else{
                 // the 1st 10 inferences must match, otherwise you have a bug to fix.
                 error_code = 1;
             }
-				
+
 			cout << "Expected idx: " << i*image_Batch+batch << endl;
 			cout << "Expected: " << std::dec << MNIST_LABEL[i*image_Batch+batch] << endl;
 			cout << "Obtained: " << std::dec << max_id << ", (" << max_num << ")"<< endl;

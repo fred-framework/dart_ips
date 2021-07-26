@@ -14,6 +14,7 @@ The columns refer to the existance of software example, the IP hardware descript
 |----------------------------------------------|--------|---------|----|------|
 | [CRC](ips/crc/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
 | [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
+| [Lenet CNN](ips/lenet/readme.md)             |    Y   |   cpp   | Y  |  N   |
 | [memcpy](ips/memcpy/readme.md)               |    Y   |   cpp   | Y  |  Y   |
 | [mul_vec](ips/mul_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [nor_vec](ips/nor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
