@@ -10,7 +10,7 @@
  * (at your option) any later version.
 */
 
-#include "lenet_fred.hpp"
+#include "lenet_fred.h"
 #include "LeNet.h"
 
 #include "parameters.h"

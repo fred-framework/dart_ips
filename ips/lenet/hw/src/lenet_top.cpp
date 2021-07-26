@@ -10,8 +10,8 @@
  * (at your option) any later version.
 */
 
-#include "lenet_top.hpp"
-#include "lenet_fred.hpp"
+#include "lenet_top.h"
+#include "lenet_fred.h"
 
 void lenet_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
 {

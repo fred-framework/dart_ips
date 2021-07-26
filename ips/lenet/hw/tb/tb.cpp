@@ -15,7 +15,7 @@
 #include "MNIST_DATA.h"
 
 #ifdef USE_FRED
-#include "lenet_top.hpp"
+#include "lenet_top.h"
 #else
 #include "LeNet_AXIS.h"
 #endif

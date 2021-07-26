@@ -13,7 +13,7 @@
 #ifndef lenet_fred_H
 #define lenet_fred_H
 
-#include "lenet_top.hpp"
+#include "lenet_top.h"
 
 void lenet_fred(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
