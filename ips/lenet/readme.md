@@ -1,35 +1,74 @@
 # LeNet CNN
 
-This IP is used with the [AMALTHEA](https://projects.eclipse.org/projects/automotive.app4mc/downloads) design flow to mimic the behavior of a generic hardware accelerator. 
+Lenet for MNIST handwritten digit recognition using Vivado hls tool. Accuracy of 97.5938% (8-bit Mode).
 
-This IP is called PREM because it obbeys the [Pretictable Execution Model](https://www.ideals.illinois.edu/bitstream/handle/2142/16605/PREMtechrep.pdf), i.e., it performs read, execution, write operations in that order.
+## DART/FRED Compatibility
 
-The user can configure the following constants to change the behavior of the IP:
+This HLS design has been adapted to work with DART and FRED tools designed by [Retis lab](retis.sssup.it/) in Scuola Sant'anna, Pisa. 
 
- - the number of words read by the IP from the main memory (*IN_MEM_SIZE*);
- - the number of clock cycles the IP spend executing some dummy logic (*EXEC_CYCLES*). This time includes the time spent in reading and writing the memory; and
- - the number of words written by the IP into the main memory (*OUT_MEM_SIZE*);
+* The [design](https://github.com/amamory-ml/mnist_hls) adapted for DART/FRED;
+* The [original](https://github.com/FloyedShen/mnist_hls) design.
 
+## Requirement
+* Vivado hls 2019.2
+* Vitis 2019.2
+* python 3+
+* DART/FRED
+
+## Usage
+* Download MNIST dataset from [MNIST](http://yann.lecun.com/exdb/mnist/) and copy the dataset to `./hw/MNIST_DATA/`.
+
+* build hls project
+```
+# When you are in the project root directory
+cd hw
+vivado_hls build.tcl
+```
+
+* Generate `tanh` table (default: ap_fixed<8,3>)
+```
+# When you are in the project root directory
+cd hw/include/filter
+python ./tanh_table.py
+```
+
+* copy the `sw` directory into the FPGA for compilation.
+
+* Run and see the results
 
 ## Resource Usage
 
 The following report includes this IP and it considers the board PYNQ-Z1 (xc7z020clg400-1).
 
-|          Site Type         | Used | Fixed | Available | Util% |
-|----------------------------|------|-------|-----------|-------|
-| Slice LUTs*                | 1137 |     0 |     53200 |  2.14 |
-|   LUT as Logic             | 1070 |     0 |     53200 |  2.01 |
-|   LUT as Memory            |   67 |     0 |     17400 |  0.39 |
-|     LUT as Distributed RAM |    0 |     0 |           |       |
-|     LUT as Shift Register  |   67 |     0 |           |       |
-| Slice Registers            | 1900 |     0 |    106400 |  1.79 |
-|   Register as Flip Flop    | 1900 |     0 |    106400 |  1.79 |
-|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
-| F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
-| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
+|          Site Type         |  Used | Fixed | Available | Util% |
+|----------------------------|-------|-------|-----------|-------|
+| Slice LUTs*                | 16230 |     0 |     53200 | 30.51 |
+|   LUT as Logic             | 16088 |     0 |     53200 | 30.24 |
+|   LUT as Memory            |   142 |     0 |     17400 |  0.82 |
+|     LUT as Distributed RAM |    63 |     0 |           |       |
+|     LUT as Shift Register  |    79 |     0 |           |       |
+| Slice Registers            |  6401 |     0 |    106400 |  6.02 |
+|   Register as Flip Flop    |  6401 |     0 |    106400 |  6.02 |
+|   Register as Latch        |     0 |     0 |    106400 |  0.00 |
+| F7 Muxes                   |  3052 |     0 |     26600 | 11.47 |
+| F8 Muxes                   |  1452 |     0 |     13300 | 10.92 |
 
+
+|     Site Type     | Used | Fixed | Available | Util% |
+|-------------------|------|-------|-----------|-------|
+| Block RAM Tile    | 12.5 |     0 |       140 |  8.93 |
+|   RAMB36/FIFO*    |    6 |     0 |       140 |  4.29 |
+|     RAMB36E1 only |    6 |       |           |       |
+|   RAMB18          |   13 |     0 |       280 |  4.64 |
+|     RAMB18E1 only |   13 |       |           |       |
+
+
+|    Site Type   | Used | Fixed | Available | Util% |
+|----------------|------|-------|-----------|-------|
+| DSPs           |    3 |     0 |       220 |  1.36 |
+|   DSP48E1 only |    3 |       |           |       |
 
 ## Authors
 
-- Alexandre Amory (July 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. This HLS design.
-- Francesco Restuccia (April 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. Initial design in VHDL.
+* Alexandre Amory (August 2021), ReTiS Lab, Scuola Sant'Anna, Pisa, Italy. Adaptation to DART/FRED.
+* Orignal design by FloyedShen;

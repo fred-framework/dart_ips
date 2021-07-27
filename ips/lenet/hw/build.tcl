@@ -21,7 +21,6 @@ add_files src/LeNet.cpp -cflags "-I$pwd/include -I$pwd/include/filter -Wno-unkno
 add_files src/lenet_fred.cpp -cflags "-I$pwd/include -Wno-unknown-pragmas"
 add_files src/lenet_top.cpp -cflags "-I$pwd/include -Wno-unknown-pragmas"
 
-
 add_files -tb tb/MNIST_DATA.cpp -csimflags "-I$pwd/include -Wno-unknown-pragmas"
 add_files -tb tb/tb.cpp -csimflags "-I$pwd/include -Wno-unknown-pragmas"
 
