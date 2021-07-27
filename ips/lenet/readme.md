@@ -40,33 +40,19 @@ python ./tanh_table.py
 
 The following report includes this IP and it considers the board PYNQ-Z1 (xc7z020clg400-1).
 
-|          Site Type         |  Used | Fixed | Available | Util% |
-|----------------------------|-------|-------|-----------|-------|
-| Slice LUTs*                | 16230 |     0 |     53200 | 30.51 |
-|   LUT as Logic             | 16088 |     0 |     53200 | 30.24 |
-|   LUT as Memory            |   142 |     0 |     17400 |  0.82 |
-|     LUT as Distributed RAM |    63 |     0 |           |       |
-|     LUT as Shift Register  |    79 |     0 |           |       |
-| Slice Registers            |  6401 |     0 |    106400 |  6.02 |
-|   Register as Flip Flop    |  6401 |     0 |    106400 |  6.02 |
-|   Register as Latch        |     0 |     0 |    106400 |  0.00 |
-| F7 Muxes                   |  3052 |     0 |     26600 | 11.47 |
-| F8 Muxes                   |  1452 |     0 |     13300 | 10.92 |
 
-
-|     Site Type     | Used | Fixed | Available | Util% |
-|-------------------|------|-------|-----------|-------|
-| Block RAM Tile    | 12.5 |     0 |       140 |  8.93 |
-|   RAMB36/FIFO*    |    6 |     0 |       140 |  4.29 |
-|     RAMB36E1 only |    6 |       |           |       |
-|   RAMB18          |   13 |     0 |       280 |  4.64 |
-|     RAMB18E1 only |   13 |       |           |       |
-
-
-|    Site Type   | Used | Fixed | Available | Util% |
-|----------------|------|-------|-----------|-------|
-| DSPs           |    3 |     0 |       220 |  1.36 |
-|   DSP48E1 only |    3 |       |           |       |
+|       Name         | BRAM_18K| DSP48E|   FF   |  LUT  | URAM|
+|--------------------|--------:|------:|-------:|------:|----:|
+|DSP                 |        -|      -|       -|      -|    -|
+|Expression          |        -|      -|       -|      -|    -|
+|FIFO                |        -|      -|       -|      -|    -|
+|Instance            |       59|      3|    7900|  34504|    0|
+|Memory              |        -|      -|       -|      -|    -|
+|Multiplexer         |        -|      -|       -|     60|    -|
+|Register            |        -|      -|      61|      -|    -|
+|**Total**           |       59|      3|    7961|  34564|    0|
+|**Available**       |      280|    220|  106400|  53200|    0|
+|**Utilization (%)** |       21|      1|       7|     64|    0|
 
 ## Authors
 
