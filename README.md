@@ -13,6 +13,7 @@ The columns refer to the existance of software example, the IP hardware descript
 | IP name                                      | sw ex. | hw lang | tb | FPGA |
 |----------------------------------------------|--------|---------|----|------|
 | [CRC](ips/crc/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
+| [FINN CNN](ips/finn/readme.md)               |    N   |   cpp   | N  |  N   |
 | [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
 | [Lenet CNN](ips/lenet/readme.md)             |    Y   |   cpp   | Y  |  N   |
 | [memcpy](ips/memcpy/readme.md)               |    Y   |   cpp   | Y  |  Y   |
