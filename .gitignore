@@ -9,6 +9,7 @@
 #################################################
 ips/fir/hw/fir*/**
 ips/memcpy/hw/memcpy*/**
+ips/mat_mult/hw/mat_mult*/**
 ips/mul_vec/hw/mul_vec*/**
 ips/sum_vec/hw/sum_vec*/**
 ips/sub_vec/hw/sub_vec*/**

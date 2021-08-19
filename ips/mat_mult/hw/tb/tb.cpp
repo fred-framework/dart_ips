@@ -30,13 +30,10 @@ void mat_mult_sw(data_t *dataA, data_t *dataB, data_t *dataOut, uint32_t mat_siz
 	for (c = 0; c < mat_size; c++) {
 		for (d = 0; d < mat_size; d++) {
 			for (k = 0; k < mat_size; k++) {
-//				a = *(dataA[c + mat_size * k]);
-//				b = *(dataB[k + mat_size * d]);
 				a = dataA[c + mat_size * k];
 				b = dataB[k + mat_size * d];
 				tot = tot + a * b;
 			}
-			//*dataOut[c + mat_size * d] = tot;
 			dataOut[c + mat_size * d] = tot;
 			tot = 0;
 		}
@@ -93,7 +90,6 @@ int main()
 	mat_mult_top(&id_out, args, (data_t *)mem_in, (data_t *)mem_out);
 
 	// generate the reference output
-	//mat_mult_sw((data_t *)&(mem_in[0][0][0]), (data_t *)&(mem_in[1][0][0]), (data_t *)mem_expected_out, MAT_SIZE);
 	mat_mult_sw((data_t *)mem_a, (data_t *)mem_b, (data_t *)mem_expected_out, MAT_SIZE);
 
 	if (memcmp(mem_out, mem_expected_out, MAT_SIZE*MAT_SIZE*sizeof(data_t))){

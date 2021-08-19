@@ -16,6 +16,7 @@ The columns refer to the existance of software example, the IP hardware descript
 | [FINN CNN](ips/finn/readme.md)               |    N   |   cpp   | N  |  N   |
 | [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
 | [Lenet CNN](ips/lenet/readme.md)             |    Y   |   cpp   | Y  |  N   |
+| [mat_mult](ips/mat_mult/readme.md)           |    Y   |   cpp   | Y  |  Y   |
 | [memcpy](ips/memcpy/readme.md)               |    Y   |   cpp   | Y  |  Y   |
 | [mul_vec](ips/mul_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [nor_vec](ips/nor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
@@ -29,7 +30,6 @@ The columns refer to the existance of software example, the IP hardware descript
 | [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
 | [fastx](ips/fastx/readme.md)                 |    N   |   cpp   | N  |  N   |
 | [gmap](ips/gmap/readme.md)                   |    N   |   cpp   | N  |  N   |
-| [mat_mult](ips/mat_mult/readme.md)           |    N   |   cpp   | N  |  N   |
 | [sobel](ips/sobel/readme.md)                 |    N   |   cpp   | N  |  N   |
 |                                              |        |         |    |      |
 

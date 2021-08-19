@@ -6,55 +6,50 @@
 
 typedef uint64_t data_t;
 
-// make sure these constants match with the hw design
-#define  ARRAY_SIZE (1024)
-//#define  BLOCK_SIZE_BYTE (ARRAY_SIZE * sizeof(data_t))
-// the size of the vector where the CRC is actually calculated
-#define  VET_SIZE 10
+const unsigned int MAT_SIZE = 4;
 
-data_t *mem_in, *mem_out;
+data_t *mem_a, *mem_b,*mem_out;
 
 const int hw_id = 100;
 
-void init_vect(data_t * base, data_t value)
-{
-	for (unsigned int i = 0; i < ARRAY_SIZE; ++i) {
-		base[i] = value + i;
-	}
-}
 
-void print_vect(uint8_t *base, unsigned int size)
+void print_mat(data_t *base_idx, unsigned int size)
 {
-	printf("[ ");
-	for (unsigned int i = 0; i < size; ++i) {
-		printf( "%02X", (uint8_t) base[i] );
+	int i,j;
+	printf("[\n");
+	for (i = 0; i < size; ++i) {
+		for (j = 0; j < size; ++j) {
+			printf("%lld ", base_idx[i + size * j]);
+		}
+		printf("\n");
 	}
-	printf("] \n");
+	printf("]\n");
 }
 
 // reference
-uint64_t crc64(uint8_t *data, uint32_t len){
-	uint64_t crc = 0;
-	uint32_t i;
-	//uint8_t byte;
+void mat_mult_sw(data_t *dataA, data_t *dataB, data_t *dataOut, uint32_t mat_size){
+	uint32_t c,d,k;
+	data_t tot=0,a,b;
 
-	while(len--){
-		//byte = *data;
-		crc ^= (uint64_t)*data++ << 56;
-		//crc ^= (uint64_t)byte << 56;
-		//data++;
-
-		for(i = 0; i < 8; ++i)
-			crc = crc << 1 ^ (crc & 0x8000000000000000 ? 0x42f0e1eba9ea3693 : 0x0000000000000000); 
+	for (c = 0; c < mat_size; c++) {
+		for (d = 0; d < mat_size; d++) {
+			for (k = 0; k < mat_size; k++) {
+				a = dataA[c + mat_size * k];
+				b = dataB[k + mat_size * d];
+				tot = tot + a * b;
+			}
+			dataOut[c + mat_size * d] = tot;
+			tot = 0;
+		}
 	}
-	return crc;
 }
 
 int main (int argc, char **argv)
 {
-	printf(" starting CRC \n");
+	printf(" starting Matrix Multiplication[%d][%d]\n",MAT_SIZE,MAT_SIZE);
 	int retval;
-	int error_code = 0;
+	int error_code = 0,idx,aux,i,j;
+	data_t mem_expected_out[MAT_SIZE*MAT_SIZE];
 
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
@@ -72,20 +67,47 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}
 
-	mem_in  = fred_map_buff(fred, hw_ip, 0);
-	if (!mem_in) {
-		printf("fred_map_buff failed on buff 0 for mem_in\n");
+	mem_a  = fred_map_buff(fred, hw_ip, 0);
+	if (!mem_a) {
+		printf("fred_map_buff failed on buff 0 for mem_a\n");
 		error_code = 1;
 	}
-	mem_out = fred_map_buff(fred, hw_ip, 1);
+	mem_b  = fred_map_buff(fred, hw_ip, 1);
+	if (!mem_b) {
+		printf("fred_map_buff failed on buff 1 for mem_b\n");
+		error_code = 1;
+	}
+	mem_out = fred_map_buff(fred, hw_ip, 2);
 	if (!mem_out) {
-		printf("fred_map_buff failed on buff 1 for mem_out\n");
+		printf("fred_map_buff failed on buff 2 for mem_out\n");
 		error_code = 1;
 	}
 
-	// set the vet length and its initial value
-	mem_in[0] = 10;
-	init_vect(&(mem_in[1]), 0x4030201004030201);
+	// set the input initial value
+	// fills mem_a with
+	// 	{2,0,0,0},
+	// 	{0,2,0,0},
+	// 	{0,0,2,0},
+	// 	{0,0,0,2}	
+	idx=0;
+	for (i=0;i<MAT_SIZE;i++){
+		for (j=0;j<MAT_SIZE;j++){
+			if (i == j)
+				mem_a[idx] = 2;
+			else
+				mem_a[idx] = 0;
+			idx++;
+		}
+	}
+
+	// fill mem_b with 1, 2, 3, 4, ..., 15
+	idx=0;
+	for (i=0;i<MAT_SIZE;i++){
+		for (j=0;j<MAT_SIZE;j++){
+			mem_b[idx] = idx;
+			idx++;
+		}
+	}	
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_ip);
@@ -94,9 +116,10 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}
 
-	// compare the hw output mem_out[0] w the sw reference
-	data_t expected_out = crc64((uint8_t*)&(mem_in[1]),VET_SIZE*sizeof(data_t));
-	if (expected_out != mem_out[0]){
+	// generate the reference output
+	mat_mult_sw((data_t *)mem_a, (data_t *)mem_b, (data_t *)mem_expected_out, MAT_SIZE);
+
+	if (memcmp(mem_out, mem_expected_out, MAT_SIZE*MAT_SIZE*sizeof(data_t))){
 		printf("Mismatch!\n");
 		error_code = 1;
 	}else{
@@ -104,9 +127,9 @@ int main (int argc, char **argv)
 	}
 
 	printf("Expected value: ");
-	print_vect((uint8_t*)&expected_out, 8);
+	print_mat((data_t *)mem_expected_out, MAT_SIZE);
 	printf("Output value  : ");
-	print_vect((uint8_t*)&(mem_out[0]), 8);
+	print_mat((data_t *)mem_out, MAT_SIZE);
 
 	//cleanup and finish
 	fred_free(fred);
