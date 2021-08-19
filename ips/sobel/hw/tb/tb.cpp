@@ -164,22 +164,43 @@ int main()
 			break;
 		}
 	}
-	%/
+	*/
 	bmp_out.write("output.bmp");
 
-	// compare the hw output w the sw reference
-	if (memcmp(expected_out, mem_out,IMG_WIDTH*IMG_HEIGHT)){
-		std::cout << "Mismatch!\n";
-		error_code = 1;
-	}else{
-		std::cout << "Match!\n";
+	// checking if the output image is empty
+	aux = 0;
+	bool not_empty_img = false;
+	for (i = 0; i < IMG_HEIGHT; i++){
+		for (j = 0; j < IMG_WIDTH; j++)	{
+			pixel32 = U32_PACK(bmp_out.data[aux+3],bmp_out.data[aux+2],bmp_out.data[aux+1],bmp_out.data[aux]);
+			if (pixel32 != 0){
+				not_empty_img = true;
+				break;
+			}
+			aux +=4;
+		}
+		if (not_empty_img){
+			break;
+		}
 	}
 
-	// print only the 10 initial lines of the images
-	std::cout << "Expected value: ";
-	print_img((data_t*)expected_out, IMG_WIDTH,5,true);
-	std::cout << "Output value  : ";
-	print_img((data_t*)mem_out, IMG_WIDTH,IMG_HEIGHT);
+	if (not_empty_img){
+		// if the img is not empty, then compare the hw output w the sw reference
+		if (memcmp(expected_out, mem_out,IMG_WIDTH*IMG_HEIGHT)){
+			std::cout << "Mismatch!\n";
+			error_code = 1;
+		}else{
+			std::cout << "Match!\n";
+		}
+		// print only the 10 initial lines of the images
+		std::cout << "Expected value: ";
+		print_img((data_t*)expected_out, IMG_WIDTH,5,true);
+		std::cout << "Output value  : ";
+		print_img((data_t*)mem_out, IMG_WIDTH,IMG_HEIGHT);
+	}else{
+		std::cout << "Mismatch - Empty output image!\n";
+		error_code = 1;
+	}
 	
 	return error_code ;
 }
