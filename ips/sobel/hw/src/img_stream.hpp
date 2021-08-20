@@ -59,15 +59,15 @@ static inline void read_image_32_(volatile data_t *img_addr, hls::Mat<ROWS, COLS
 			// Get packed pixel from the memory
 			pixel_in_p = img_addr[line * IMG_WIDTH + off];
 
-#ifndef __SYNTHESIS__
-			if (line == 0 && off == 0) {
-				std::cout << "in pk: " << std::hex << pixel_in_p << std::endl;
+// #ifndef __SYNTHESIS__
+// 			if (line == 0 && off == 0) {
+// 				std::cout << "in pk: " << std::hex << pixel_in_p << std::endl;
 
-				std::cout << "in: " << (data_t)U32_B1(pixel_in_p) << " "
-							<< (data_t)U32_B2(pixel_in_p) << " " << (data_t)U32_B3(pixel_in_p)
-							<< std::endl;
-			}
-#endif
+// 				std::cout << "in: " << (data_t)U32_B1(pixel_in_p) << " "
+// 							<< (data_t)U32_B2(pixel_in_p) << " " << (data_t)U32_B3(pixel_in_p)
+// 							<< std::endl;
+// 			}
+// #endif
 			// Unpack pixel
 			pixel_in.val[0] = U32_B2(pixel_in_p);	// R
 			pixel_in.val[1] = U32_B1(pixel_in_p);	// G
@@ -93,17 +93,17 @@ static inline void write_image_32_(volatile data_t *img_addr, hls::Mat<ROWS, COL
 			mat_image >> pixel_out;
 			pixel_out_p = (data_t)U32_PACK(0, pixel_out.val[0], pixel_out.val[1], pixel_out.val[2]);
 
-#ifndef __SYNTHESIS__
-			if (line == 0 && off == 0) {
-				std::cout << "out: " << (data_t)pixel_out.val[0] << " "
-						<< (data_t)pixel_out.val[1] << " " <<
-						(data_t)pixel_out.val[2] << std::endl;
+// #ifndef __SYNTHESIS__
+// 			if (line == 0 && off == 0) {
+// 				std::cout << "out: " << (data_t)pixel_out.val[0] << " "
+// 						<< (data_t)pixel_out.val[1] << " " <<
+// 						(data_t)pixel_out.val[2] << std::endl;
 
-				std::cout << "out pk: " << std::hex <<
-						(data_t)U32_PACK(pixel_out.val[0], pixel_out.val[1], pixel_out.val[2], 0)
-						<< std::endl;
-			}
-#endif
+// 				std::cout << "out pk: " << std::hex <<
+// 						(data_t)U32_PACK(pixel_out.val[0], pixel_out.val[1], pixel_out.val[2], 0)
+// 						<< std::endl;
+// 			}
+// #endif
 			// Store pixel into memory
 			img_addr[line * IMG_WIDTH + off] = pixel_out_p;
 		}

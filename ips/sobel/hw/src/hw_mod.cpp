@@ -23,11 +23,20 @@ template<int ROWS, int COLS, int T>
 static inline void processing_stack_sobel(hls::Mat<ROWS, COLS, T> &src_image, hls::Mat<ROWS, COLS, T> &dest_image)
 {
 #pragma HLS dataflow
+// On how to use Array2Mat
+// https://forums.xilinx.com/t5/High-Level-Synthesis-HLS/Usage-of-hls-Array2Mat-with-RGB-Image/td-p/903310
 
 	hls::Mat<ROWS, COLS, HLS_8UC1> img_gray_0;
 	hls::Mat<ROWS, COLS, HLS_8UC1> img_gray_1;
 	// cv::Mat img0=cv::Mat::zeros(ROWS,COLS,HLS_8UC1);
 	// cv::Mat img1=cv::Mat::zeros(ROWS,COLS,HLS_8UC1);
+	//ap_uint<32> rgb[ROWS*COLS] = {};
+	//data_t rgb[ROWS*COLS] = {};
+
+	//hls::Mat<MAX_HEIGHT, MAX_WIDTH, HLS_8UC3> rgb(MAX_HEIGHT, MAX_WIDTH);
+	//hls::Mat2Array<COLS, ap_uint<32>, ROWS, COLS, HLS_8UC3>(src_image, rgb);
+	//write_image_32_(rgb,src_image);
+
 
 	hls::CvtColor<HLS_RGB2GRAY>(src_image, img_gray_0);
 	// hlsMat2cvMat(img_gray_0, img0);

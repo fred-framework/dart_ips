@@ -10,6 +10,9 @@
 // https://github.com/Xilinx/Vitis_Libraries/tree/master/vision/L1/examples/sobelfilter
 
 // opencv example https://github.com/STFleming/HLS_OpenCV/tree/master
+// https://github.com/ATaylorCEngFIET/Hackster/tree/master/Sobel <===
+//   https://www.hackster.io/adam-taylor/fpga-based-edge-detection-using-hls-192ad2
+//   https://github.com/ATaylorCEngFIET/Hackster/blob/master/Sobel/solution1/script.tcl
 
 typedef uint32_t args_t;
 typedef uint64_t data_t;
