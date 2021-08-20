@@ -23,14 +23,14 @@ add_files src/hw_mod.cpp
 add_files -tb tb/tb.cpp -csimflags "-I$pwd/tb -Wno-unknown-pragmas"
 
 # the generic part of the HLS script
-#source ../../../scripts/ip_hls.tcl
-set_top ${top_name}
-open_solution -reset "solution_0"
-set_part ${device} -tool vivado
-create_clock -period ${period} -name default
+source ../../../scripts/ip_hls.tcl
+# set_top ${top_name}
+# open_solution -reset "solution_0"
+# set_part ${device} -tool vivado
+# create_clock -period ${period} -name default
 
-#csim_design -ldflags "-L ${OPENCV_LIB} ${OPENCV_LIB_REF}" -argv "${XF_PROJ_ROOT}/data/128x128.png"
-csim_design
+# #csim_design -ldflags "-L ${OPENCV_LIB} ${OPENCV_LIB_REF}" -argv "${XF_PROJ_ROOT}/data/128x128.png"
+# csim_design
 
 close_project
 exit
