@@ -11,6 +11,7 @@
 */
 
 #include <hls_video.h>
+//#include <hls_opencv.h>
 #include <ap_fixed.h>
 
 #include "sobel_top.hpp"
@@ -25,9 +26,15 @@ static inline void processing_stack_sobel(hls::Mat<ROWS, COLS, T> &src_image, hl
 
 	hls::Mat<ROWS, COLS, HLS_8UC1> img_gray_0;
 	hls::Mat<ROWS, COLS, HLS_8UC1> img_gray_1;
+	// cv::Mat img0=cv::Mat::zeros(ROWS,COLS,HLS_8UC1);
+	// cv::Mat img1=cv::Mat::zeros(ROWS,COLS,HLS_8UC1);
 
 	hls::CvtColor<HLS_RGB2GRAY>(src_image, img_gray_0);
+	// hlsMat2cvMat(img_gray_0, img0);
+	// cv::imwrite("gray-in.jpg",img0);
 	hls::Sobel<1,0,3>(img_gray_0, img_gray_1);
+	// hlsMat2cvMat(img_gray_1, img1);
+	// cv::imwrite("gray-out.jpg",img1);
 	hls::CvtColor<HLS_GRAY2RGB>(img_gray_1, dest_image);
 }
 

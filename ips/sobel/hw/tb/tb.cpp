@@ -4,6 +4,13 @@
 // source: https://github.com/sol-prog/cpp-bmp-images
 #include "BMP.h"
 
+// Vitis Vision Library
+// https://xilinx.github.io/Vitis_Libraries/vision/2020.1/index.html
+// https://xilinx.github.io/Vitis_Libraries/vision/2020.1/api-reference.html#sobel-filter
+// https://github.com/Xilinx/Vitis_Libraries/tree/master/vision/L1/examples/sobelfilter
+
+// opencv example https://github.com/STFleming/HLS_OpenCV/tree/master
+
 typedef uint32_t args_t;
 typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
