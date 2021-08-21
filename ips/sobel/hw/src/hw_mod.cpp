@@ -17,7 +17,7 @@
 #include "sobel_top.hpp"
 #include "hw_mod.hpp"
 #include "img_stream.hpp"
-#include "data.hpp"
+//#include "data.hpp"
 
 template<int ROWS, int COLS, int T>
 static inline void processing_stack_sobel(hls::Mat<ROWS, COLS, T> &src_image, hls::Mat<ROWS, COLS, T> &dest_image)

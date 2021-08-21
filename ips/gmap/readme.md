@@ -19,6 +19,37 @@ Fred finished
 
 |          Site Type         | Used | Fixed | Available | Util% |
 |----------------------------|-----:|------:|----------:|------:|
+| Slice LUTs*                | 2004 |     0 |     53200 |  3.77 |
+|   LUT as Logic             | 1803 |     0 |     53200 |  3.39 |
+|   LUT as Memory            |  201 |     0 |     17400 |  1.16 |
+|     LUT as Distributed RAM |   48 |     0 |           |       |
+|     LUT as Shift Register  |  153 |     0 |           |       |
+| Slice Registers            | 2582 |     0 |    106400 |  2.43 |
+|   Register as Flip Flop    | 2582 |     0 |    106400 |  2.43 |
+|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
+| F7 Muxes                   |    0 |     0 |     26600 |  0.00 |
+| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
+
+
+|     Site Type     | Used | Fixed | Available | Util% |
+|-------------------|-----:|------:|----------:|------:|
+| Block RAM Tile    |  3.5 |     0 |       140 |  2.50 |
+|   RAMB36/FIFO*    |    3 |     0 |       140 |  2.14 |
+|     RAMB36E1 only |    3 |       |           |       |
+|   RAMB18          |    1 |     0 |       280 |  0.36 |
+|     RAMB18E1 only |    1 |       |           |       |
+
+
+|    Site Type   | Used | Fixed | Available | Util% |
+|----------------|-----:|------:|----------:|------:|
+| DSPs           |    3 |     0 |       220 |  1.36 |
+|   DSP48E1 only |    3 |       |           |       |
+
+
+
+
+|          Site Type         | Used | Fixed | Available | Util% |
+|----------------------------|-----:|------:|----------:|------:|
 | Slice LUTs*                | 1682 |     0 |     53200 |  3.16 |
 |   LUT as Logic             | 1505 |     0 |     53200 |  2.83 |
 |   LUT as Memory            |  177 |     0 |     17400 |  1.02 |
