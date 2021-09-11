@@ -21,8 +21,8 @@
 
 #define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
 #define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
-// the input and output time does not count in the prem model; 30 is the constant additional latency of the internal pipeline
-#define EXEC_SIZE EXEC_CYCLES-30-IN_MEM_SIZE-OUT_MEM_SIZE
+// the input and output time does not count in the prem model; 20 is the constant additional latency of the internal pipeline. with this constant, the final latency match with EXEC_CYCLES
+#define EXEC_SIZE EXEC_CYCLES-20-IN_MEM_SIZE-OUT_MEM_SIZE
 
 void prem(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
