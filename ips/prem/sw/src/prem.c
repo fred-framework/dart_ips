@@ -7,6 +7,7 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 typedef uint64_t data_t;
+const uint32_t AXIM_MAX_DATA_SIZE = 32;
 
 // change here to set up the # in/out and execution cycles of the hw module
 #define IN_MEM_SIZE 16
@@ -26,32 +27,43 @@ const int hw_id = 100;
 void init_vect(data_t* base_idx, data_t value, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		base_idx[i] = value + i;
+		base_idx[i] = value;
 	}
 }
 
 void print_vect(data_t *base, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		printf("%d\t%ld\n",i,base[i]);
+		printf("%d\t0x%lX\n",i,(long unsigned)base[i]);
 	}
 	printf("\n");
 }
 
-// the expected output is the sum of the inputs + the number fo clock cycles for execution + the output position index.
-// for instance, if the input is a vectore of 10 positions with values 1, 2, 3 ... 10
-// the there is 1000 clock cycles for execution, then the output is:
-// 1+2+3+...+10+1000 + 0 for position 0 of the output vector
-// 1+2+3+...+10+1000 + 1 for position 1 of the output vector
-// 1+2+3+...+10+1000 + 2 for position 2 of the output vector
-// ...
-uint32_t check_output(data_t *base, unsigned int size, data_t expected_value)
+// compare both vectors
+uint32_t check_output(data_t *base, data_t *expected, unsigned int size)
 {
 	for (unsigned int i = 0; i < size; ++i) {
-		if (base[i] != (expected_value+i))
+		if (base[i] != expected[i])
 			return 0;
 	}
 	return 1;
+}
+
+// pseudo random number generator based on an LFSR w 32 bits
+// "basic C" version of the LFSR defined in prem.cpp
+unsigned int pseudo_random(unsigned int seed) {
+	unsigned int lfsr;
+	lfsr = seed;
+	unsigned char b_32 = (lfsr >> (32-32)) & 1;
+	unsigned char b_22 = (lfsr >> (32-22)) & 1;
+	unsigned char b_2  = (lfsr >> (32-2)) & 1;
+	unsigned char b_1  = (lfsr >> (32-1)) & 1;
+	unsigned char new_bit = b_32 ^ b_22 ^ b_2 ^ b_1;
+	lfsr = lfsr >> 1;
+	//lfsr.set_bit(31, new_bit);
+	lfsr |= (uint32_t)( new_bit ) << 31;
+
+	return lfsr;
 }
 
 int main (int argc, char **argv)
@@ -60,9 +72,11 @@ int main (int argc, char **argv)
 
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
-	int retval;
+	int retval,i;
+	unsigned int lfsr;
 	int error_code = 0;
 	data_t count_input_val=0;
+	data_t expected_mem_out[OUT_MEM_SIZE];
     
 	retval = fred_init(&fred);
 	if (retval) {
@@ -89,7 +103,7 @@ int main (int argc, char **argv)
 	}
 
 	// set input values
-	init_vect(mem_in, 0, IN_MEM_SIZE);
+	init_vect(mem_in, 1, AXIM_MAX_DATA_SIZE);
 
 	// Call fred IP
 	retval = fred_accel(fred, hw_ip);
@@ -98,26 +112,39 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}		
 
-	// calculate the base for the expected value
-	for (int i = 0; i < IN_MEM_SIZE; ++i) {
+	// calculate expected value
+	for (i = 0; i < IN_MEM_SIZE; ++i) {
 		count_input_val += mem_in[i];
 	}
-	for (int i = 0; i < EXEC_SIZE; ++i) {
-		count_input_val += i;
-	}	
+	lfsr = count_input_val;
+	printf("in: 0x%lX\n", (long unsigned)lfsr);
+	for (i = 0; i < EXEC_SIZE; ++i) {
+		lfsr = pseudo_random(lfsr);
+	}
+	printf("exec: 0x%lX\n", (long unsigned)lfsr);
+	for (i = 0; i < OUT_MEM_SIZE; ++i) {
+		expected_mem_out[i] = lfsr;
+		lfsr = pseudo_random(lfsr);		
+	}
+	printf("out: 0x%lX\n", (long unsigned)lfsr);
 
-	if (check_output(mem_out, OUT_MEM_SIZE, count_input_val) != 1){
+	// validation
+	if (check_output(mem_out, expected_mem_out, OUT_MEM_SIZE) != 1){
 		printf("Mismatch!\n");
 		error_code = 1;
 	}else{
-		//std::cout << "Match!\n";
 		printf("Match!\n");
 	}
 	printf("Input Content [0:9]:\n");
-	print_vect(&(mem_in[3]), MIN(10,IN_MEM_SIZE));
-	printf("Expected Initial value at the output : %d \n", count_input_val);
+	print_vect(&(mem_in[0]), MIN(5,IN_MEM_SIZE));
+	printf("Expected Initial value at the output : 0x%lX \n", (long unsigned)expected_mem_out[0]);
+	print_vect(expected_mem_out, MIN(5,OUT_MEM_SIZE));
 	printf("Output Content [0:9]:\n");
-	print_vect(mem_out, MIN(10,OUT_MEM_SIZE));
+	print_vect(mem_out, MIN(5,OUT_MEM_SIZE));
+
+	// this loop is required just to avoid messing up with the printed messages 
+	// caused by the messages printed by fred_free
+	for(i=0;i<100000000;i++);
 
 	//cleanup and finish
 	fred_free(fred);
