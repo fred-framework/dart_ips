@@ -84,7 +84,7 @@ int main()
 	args[0] = (args_t)0;
 	args[1] = (args_t)0;
 
-	// assumng the input vector is filled with 'ones' 
+	// assuming the input vector is filled with 'ones' 
 	init_vect(mem_in, 1, AXIM_MAX_DATA_SIZE);
 
 	// C/RTL cosim requires at least two executions of the design under test

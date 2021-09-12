@@ -13,6 +13,7 @@ The columns refer to the existance of software example, the IP hardware descript
 | IP name                                      | sw ex. | hw lang | tb | FPGA |
 |----------------------------------------------|--------|---------|----|------|
 | [CRC](ips/crc/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
+| [fastx](ips/fastx/readme.md)                 |    Y   |   cpp   | Y  |  Y   |
 | [FINN CNN](ips/finn/readme.md)               |    N   |   cpp   | N  |  N   |
 | [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
 | [Lenet CNN](ips/lenet/readme.md)             |    Y   |   cpp   | Y  |  N   |
@@ -22,15 +23,14 @@ The columns refer to the existance of software example, the IP hardware descript
 | [nor_vec](ips/nor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [prem](ips/prem/readme.md)                   |    Y   |   cpp   | Y  |  Y   |
 | [prem_config](ips/prem_config/readme.md)     |    Y   |   cpp   | Y  |  Y   |
+| [sobel](ips/sobel/readme.md)                 |    Y   |   cpp   | Y  |  Y   |
 | [sub_vec](ips/sub_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [sum_vec](ips/sum_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 | [xor_vec](ips/xor_vec/readme.md)             |    Y   |   cpp   | Y  |  Y   |
 |----------------------------------------------|--------|---------|----|------|
 | [amalthea_prem](ips/amalthea_prem/readme.md) |    N   |   vhd   | Y  |  N   |
 | [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
-| [fastx](ips/fastx/readme.md)                 |    N   |   cpp   | N  |  N   |
 | [gmap](ips/gmap/readme.md)                   |    N   |   cpp   | N  |  N   |
-| [sobel](ips/sobel/readme.md)                 |    N   |   cpp   | N  |  N   |
 |                                              |        |         |    |      |
 
 ## Summary of Static Parts
