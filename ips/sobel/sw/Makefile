@@ -14,17 +14,15 @@
 
 all:
 	cd src/reference/src && make && cd -
-	pwd
 	mkdir -p build
 	cd build && cmake .. && make 
 
 run:
 	convert src/reference/imgs/img.png src/reference/imgs/img.rgb
-	./syntetic src/reference/imgs/img.rgb src/reference/imgs/img_out.gray 512x512
+	./synthetic
 	convert -size 512x512 -depth 8 src/reference/imgs/img_out.gray img_out.png
 
 clean: 
 	cd src/reference/src && make clean && cd -
 	rm -f src/reference/imgs/img_out* src/reference/imgs/img.rgb
 	rm -rf build
-

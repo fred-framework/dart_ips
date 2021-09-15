@@ -1,11 +1,12 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
 #include "fred_lib.h"
 // source: https://github.com/sol-prog/cpp-bmp-images
-#include "BMP.h"
+//#include "BMP.h"
 
 
 #include "macros.h"
@@ -15,8 +16,8 @@
 
 typedef uint64_t data_t;
 
-static const unsigned int IMG_WIDTH = 32;
-static const unsigned int IMG_HEIGHT = 32;
+static const unsigned int IMG_WIDTH = 512;
+static const unsigned int IMG_HEIGHT = 512;
 
 data_t *mem_in, *mem_out;
 
@@ -33,32 +34,42 @@ const int hw_id = 100;
 #define U32_B2(pixel) (((pixel) >> 16) & 0xff) // R
 #define U32_B3(pixel) (((pixel) >> 24) & 0xff) // alpha
 
-data_t expected_out[IMG_WIDTH*IMG_HEIGHT] = {
-	//U32_PACK(0,1,2,3), ... , U32_PACK(0,255,200,100), 
-	0
-};
+//data_t expected_out[IMG_WIDTH*IMG_HEIGHT] ;
+// = {
+// 	//U32_PACK(0,1,2,3), ... , U32_PACK(0,255,200,100), 
+// 	0
+// };
 
 // assign a lower height to print the image partially
-void print_img(data_t *base_idx, unsigned int width, unsigned int height, bool rgb=true)
+void print_img(data_t *base_idx, unsigned int width, unsigned int height, unsigned rgb)
 {
 	int i,j;
 	data_t pixel;
-	std::cout << "[ \n";
+	//std::cout << "[ \n";
+	printf("[\n");
 	for (i = 0; i < height; ++i) {
 		for (j = 0; j < width; ++j) {
 			pixel = base_idx[j + height * i];
 			if (rgb){
-				std::cout 	<< (unsigned int)U32_B3(pixel) << ","
-							<< (unsigned int)U32_B2(pixel) << ","
-							<< (unsigned int)U32_B1(pixel) << ","
-							<< (unsigned int)U32_B0(pixel) << ", ";
+				printf("%d,%d,%d,%d ",
+					(unsigned int)U32_B3(pixel),
+					(unsigned int)U32_B2(pixel),
+					(unsigned int)U32_B1(pixel),
+					(unsigned int)U32_B0(pixel));
+				// std::cout 	<< (unsigned int)U32_B3(pixel) << ","
+				// 			<< (unsigned int)U32_B2(pixel) << ","
+				// 			<< (unsigned int)U32_B1(pixel) << ","
+				// 			<< (unsigned int)U32_B0(pixel) << ", ";
 			}else{
-				std::cout << base_idx[j + height * i] <<  " ";
+				//std::cout << base_idx[j + height * i] <<  " ";
+				printf("%lld ",base_idx[j + height * i]);
 			}
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
+		printf("\n");
 	}
-	std::cout << "]" << std::endl;
+	//std::cout << "]" << std::endl;
+	printf("]\n");
 }
 
 int main (int argc, char **argv)
@@ -71,11 +82,8 @@ int main (int argc, char **argv)
 	struct timespec start, end;
 	double time_taken;
 
-    char *file_in,
-         *file_out,
-         *file_out_h,
-         *file_out_v,
-         *file_gray;
+    char file_in[50],
+         file_out[50];
 
     byte *rgb,
          *gray,
@@ -88,9 +96,10 @@ int main (int argc, char **argv)
 	int rgb_size = width*height*3;
 
     // File names
-    file_in = "reference/imgs/img.png";
-    file_out = "out.png";
+    strcpy(file_in,"src/reference/imgs/img.rgb");
+    strcpy(file_out,"src/reference/imgs/img_out.gray");
 
+/*
 	// fred related data structures and setup
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
@@ -118,7 +127,7 @@ int main (int argc, char **argv)
 		printf("fred_map_buff failed on buff 1 for mem_out\n");
 		error_code = 1;
 	}
-
+*/
 
     // Read file to rgb and get size
     readFile(file_in, &rgb, rgb_size);
@@ -133,7 +142,7 @@ int main (int argc, char **argv)
 	// Calculating total time taken by the sw implementation.
 	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
-	printf("Time taken by FRED is : %09f\n", time_taken);
+	printf("Time taken by the CPU is : %09f\n", time_taken);
 /*
 	// using has_alpha = true to be compatible with the hw encoding
 	BMP bmp(IMG_WIDTH, IMG_HEIGHT, true);
@@ -188,7 +197,7 @@ int main (int argc, char **argv)
 	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
 	printf("Time taken by FRED is : %09f\n", time_taken);
-*/
+
 
 	// checking if the output image is empty
 	aux = 0;
@@ -224,9 +233,13 @@ int main (int argc, char **argv)
 		std::cout << "Mismatch - Empty output image!\n";
 		error_code = 1;
 	}
+*/
+	// this loop is required just to avoid messing up with the printed messages 
+	// caused by the messages printed by fred_free
+	for(i=0;i<100000000;i++);
 
 	//cleanup and finish
-	fred_free(fred);
+	//fred_free(fred);
 	printf("Fred finished\n");
 
 	return(error_code);
