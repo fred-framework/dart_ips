@@ -14,12 +14,11 @@
 #define SLOTS_HPP
 
 #include <stdint.h>
-#include "ap_int.h"
 
 typedef uint32_t args_t;
-typedef ap_uint<64> data_t;
+typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
 
-void fir(volatile data_t *in, volatile data_t *out);
+void fir_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 #endif /* SLOTS_HPP */

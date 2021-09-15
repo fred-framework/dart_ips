@@ -11,6 +11,7 @@
 */
 
 #include "fir_top.hpp"
+#include "fir.hpp"
 
 void fir_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out)
 {
