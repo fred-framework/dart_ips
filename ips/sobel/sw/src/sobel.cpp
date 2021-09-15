@@ -2,9 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include "fred_lib.h"
 // source: https://github.com/sol-prog/cpp-bmp-images
 #include "BMP.h"
+
+
+#include "macros.h"
+#include "sobel.h"
+#include "file_operations.h"
+
 
 typedef uint64_t data_t;
 
@@ -61,7 +68,30 @@ int main (int argc, char **argv)
 	int error_code = 0,idx,aux,i,j;
 	data_t pixel64;
 	uint32_t pixel32;
+	struct timespec start, end;
+	double time_taken;
 
+    char *file_in,
+         *file_out,
+         *file_out_h,
+         *file_out_v,
+         *file_gray;
+
+    byte *rgb,
+         *gray,
+         *sobel_h_res,
+         *sobel_v_res,
+         *contour_img;
+
+    int width = IMG_WIDTH;
+    int height = IMG_HEIGHT;
+	int rgb_size = width*height*3;
+
+    // File names
+    file_in = "reference/imgs/img.png";
+    file_out = "out.png";
+
+	// fred related data structures and setup
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
     
@@ -90,6 +120,21 @@ int main (int argc, char **argv)
 	}
 
 
+    // Read file to rgb and get size
+    readFile(file_in, &rgb, rgb_size);
+
+	clock_gettime(CLOCK_MONOTONIC, &start);
+    int gray_size = sobelFilter(rgb, &gray, &sobel_h_res, &sobel_v_res, &contour_img, width, height);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+
+    // Write sobel img to a file
+    writeFile(file_out, contour_img, gray_size);
+
+	// Calculating total time taken by the sw implementation.
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by FRED is : %09f\n", time_taken);
+/*
 	// using has_alpha = true to be compatible with the hw encoding
 	BMP bmp(IMG_WIDTH, IMG_HEIGHT, true);
 	BMP bmp_out(IMG_WIDTH, IMG_HEIGHT, true);
@@ -101,6 +146,7 @@ int main (int argc, char **argv)
 	bmp.write("input.bmp");	
 
 	// copying the bmp data into the hw buffer with data_t format
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	aux = 0;
 	for (i = 0; i < IMG_HEIGHT; i++){
 		for (j = 0; j < IMG_WIDTH; j++)	{
@@ -134,7 +180,15 @@ int main (int argc, char **argv)
 		}
 		
 	}
+	clock_gettime(CLOCK_MONOTONIC, &end);		
 	bmp_out.write("output.bmp");
+
+	// Calculating total time taken by the FPGA offloading.
+	double time_taken;
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by FRED is : %09f\n", time_taken);
+*/
 
 	// checking if the output image is empty
 	aux = 0;

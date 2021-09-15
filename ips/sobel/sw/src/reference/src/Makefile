@@ -1,5 +1,4 @@
 # Copyright 2018 Pedro Melgueira
-# Copyright 2021 Alexandre Amory. Adaptations to run with FRED/DART
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,19 +11,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-all:
-	cd src/reference/src && make && cd -
-	pwd
-	mkdir -p build
-	cd build && cmake .. && make 
+FILES=main.c sobel.c file_operations.c
+OBJS=$(FILES:.c=.o)
+ARQUIVE=libsobel.a
+EXE=sobel
+FLAGS=-std=c99 -g -lm
 
-run:
-	convert src/reference/imgs/img.png src/reference/imgs/img.rgb
-	./syntetic src/reference/imgs/img.rgb src/reference/imgs/img_out.gray 512x512
-	convert -size 512x512 -depth 8 src/reference/imgs/img_out.gray img_out.png
+all: $(OBJS) archive
+	gcc $(OBJS) -o $(EXE) $(FLAGS)
 
-clean: 
-	cd src/reference/src && make clean && cd -
-	rm -f src/reference/imgs/img_out* src/reference/imgs/img.rgb
-	rm -rf build
+.c.o:
+	gcc -c $< -o $@ $(FLAGS)
+
+archive:
+	ar rcs $(ARQUIVE) $(OBJS)
+
+clean:
+	rm -f $(OBJS) $(ARQUIVE) $(EXE)
 

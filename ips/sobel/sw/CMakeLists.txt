@@ -142,3 +142,6 @@ endif()
 #   target_link_libraries(synthetic fred)
 # endif()
 
+# include the sw sobel reference implementation
+target_include_directories(cmake PRIVATE reference/src)
+target_link_libraries(cmake ${PROJECT_SOURCE_DIR}/reference/src/libsobel.a)

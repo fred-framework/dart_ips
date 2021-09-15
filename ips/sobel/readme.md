@@ -44,6 +44,14 @@ Fred finished
 |   DSP48E1 only |    3 |       |           |       |
 
 
+## Software Requirements
+
+The linux `convert` command is required for testing this IP. Install it with:
+
+```
+sudo apt install imagemagick
+```
+
 ## Authors
 
 - Marco Pagani, HLS IP design
