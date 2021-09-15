@@ -8,8 +8,17 @@
 #include "./bnn/interpret.hpp"
 #include "./bnn/mvau.hpp"
 
-#include "params_weights.hpp"
-#include "params_thresholds.hpp"
+//#include "params_weights.hpp"
+//#include "params_thresholds.hpp"
+#include "memdata-0.h"
+#include "memdata-1.h"
+#include "memdata-2.h"
+#include "memdata-3.h"
+#include "memdata-4.h"
+#include "memdata-5.h"
+#include "memdata-6.h"
+#include "memdata-7.h"
+#include "memdata-8.h"
 
 void do_compute(ap_uint<64> *in, ap_uint<64> *out)
 {
