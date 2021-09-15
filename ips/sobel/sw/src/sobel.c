@@ -5,14 +5,10 @@
 #include <unistd.h>
 #include <time.h>
 #include "fred_lib.h"
-// source: https://github.com/sol-prog/cpp-bmp-images
-//#include "BMP.h"
-
 
 #include "macros.h"
 #include "sobel.h"
 #include "file_operations.h"
-
 
 typedef uint64_t data_t;
 
@@ -43,40 +39,28 @@ const int hw_id = 100;
 // };
 
 // assign a lower height to print the image partially
-void print_img(data_t *base_idx, unsigned int width, unsigned int height, unsigned rgb)
+void print_img(byte *base_idx, unsigned int width, unsigned int height, unsigned rgb)
 {
-	int i,j;
+	int i,j,aux=0;
 	data_t pixel;
-	//std::cout << "[ \n";
 	printf("[\n");
 	for (i = 0; i < height; ++i) {
 		for (j = 0; j < width; ++j) {
 			pixel = base_idx[j + height * i];
 			if (rgb){
-				printf("%d,%d,%d,%d ",
-					(unsigned int)U32_B3(pixel),
-					(unsigned int)U32_B2(pixel),
-					(unsigned int)U32_B1(pixel),
-					(unsigned int)U32_B0(pixel));
-				// std::cout 	<< (unsigned int)U32_B3(pixel) << ","
-				// 			<< (unsigned int)U32_B2(pixel) << ","
-				// 			<< (unsigned int)U32_B1(pixel) << ","
-				// 			<< (unsigned int)U32_B0(pixel) << ", ";
+				printf("%d,%d,%d ", base_idx[aux+2], base_idx[aux+1], base_idx[aux]);
 			}else{
-				//std::cout << base_idx[j + height * i] <<  " ";
-				printf("%lld ",base_idx[j + height * i]);
+				printf("%d ",(uint32_t)U32_PACK(0,base_idx[aux+2], base_idx[aux+1], base_idx[aux]));
 			}
 		}
-		//std::cout << std::endl;
 		printf("\n");
 	}
-	//std::cout << "]" << std::endl;
 	printf("]\n");
 }
 
 int main (int argc, char **argv)
 {
-	printf(" starting Sobel filter for images[%d][%d]\n",IMG_WIDTH,IMG_HEIGHT);
+	printf(" starting Sobel filter for images %dx%d\n",IMG_WIDTH,IMG_HEIGHT);
 	int retval;
 	int error_code = 0,idx,aux,i,j;
 	data_t pixel64;
@@ -96,13 +80,13 @@ int main (int argc, char **argv)
 	// has FRED ouput image
 	byte img_out[IMG_WIDTH*IMG_HEIGHT*3];
 
-    int width = IMG_WIDTH;
-    int height = IMG_HEIGHT;
-    int rgb_size = width*height*3;
+	int width = IMG_WIDTH;
+	int height = IMG_HEIGHT;
+	int rgb_size = width*height*3;
 
-    // File names
-    strcpy(file_in,"src/reference/imgs/img.rgb");
-    strcpy(file_out,"src/reference/imgs/img_out.gray");
+	// File names
+	strcpy(file_in,"src/reference/imgs/img.rgb");
+	strcpy(file_out,"src/reference/imgs/img_out.gray");
 
 	// fred related data structures and setup
 	struct fred_data *fred;
@@ -132,31 +116,20 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}
 
-    // Read file to rgb and get size
-    readFile(file_in, &rgb, rgb_size);
+	// Read file to rgb and get size
+	readFile(file_in, &rgb, rgb_size);
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
-    int gray_size = sobelFilter(rgb, &gray, &sobel_h_res, &sobel_v_res, &contour_img, width, height);
+	int gray_size = sobelFilter(rgb, &gray, &sobel_h_res, &sobel_v_res, &contour_img, width, height);
 	clock_gettime(CLOCK_MONOTONIC, &end);
 
-    // Write sobel img to a file
-    writeFile(file_out, contour_img, gray_size);
+	// Write sobel img to a file
+	writeFile(file_out, contour_img, gray_size);
 
 	// Calculating total time taken by the sw implementation.
 	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
 	printf("Time taken by the CPU is : %09f\n", time_taken);
-/*
-	// using has_alpha = true to be compatible with the hw encoding
-	BMP bmp(IMG_WIDTH, IMG_HEIGHT, true);
-	BMP bmp_out(IMG_WIDTH, IMG_HEIGHT, true);
-	// fill w a red square
-	bmp.fill_region(0, 0, 20, 20, 0, 0, 255, 0);
-	// make sure the output image is blank
-	bmp_out.fill_region(0, 0, IMG_WIDTH, IMG_HEIGHT, 0, 0, 0, 0);
-	// the image is save in the dir ips/sobel/hw/sobel/solution_0/csim/build
-	bmp.write("input.bmp");	
-*/
 
 	// copying the bmp data into the hw buffer with data_t format
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -165,15 +138,10 @@ int main (int argc, char **argv)
 		for (j = 0; j < IMG_WIDTH; j++)	{
 			// 32bits alpha, r, g, b is transformed into data_t/64bits alpha, r, g, b
 			// very unoptimised encoding
-			//pixel32 = U32_PACK(bmp.data[aux+3],bmp.data[aux+2],bmp.data[aux+1],bmp.data[aux]);
 			pixel32 = U32_PACK(0,rgb[aux+2],rgb[aux+1],rgb[aux]);
-			//printf("%d - %d - %d\n",j + IMG_HEIGHT * i,i,j);
 			mem_in[j + IMG_HEIGHT * i] = (data_t)pixel32;
-			// if (i==0)
-			// 	printf ("%lld - %d - (%d,%d,%d,%d)\n", mem_in[j + IMG_HEIGHT * i], pixel32,bmp.data[aux],bmp.data[aux+1],bmp.data[aux+2],bmp.data[aux+3]);
 			aux +=3;
 		}
-		
 	}
 
 	// Call fred IP
@@ -183,43 +151,37 @@ int main (int argc, char **argv)
 		error_code = 1;
 	}
 
-
 	// copying the hw buffer with data_t format into the bmp data format
 	aux = 0;
 	for (i = 0; i < IMG_HEIGHT; i++){
 		for (j = 0; j < IMG_WIDTH; j++)	{
 			// convert data_t/64bits alpha, r, g, b into 8bits alpha, r, g, b
 			pixel64 = mem_out[j + IMG_HEIGHT * i];
-			// bmp_out.set_pixel(i,j,
-			// 	(uint8_t)U32_B0(pixel64),(uint8_t)U32_B1(pixel64),
-			// 	(uint8_t)U32_B2(pixel64),(uint8_t)U32_B3(pixel64));
 			img_out[i+2] = (uint8_t)U32_B2(pixel64);
 			img_out[i+1] = (uint8_t)U32_B1(pixel64);
 			img_out[i]   = (uint8_t)U32_B0(pixel64);
 			aux +=3;
 		}
-		
 	}
 	clock_gettime(CLOCK_MONOTONIC, &end);		
-	//bmp_out.write("output.bmp");
 
 	// Calculating total time taken by the FPGA offloading.
 	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
 	printf("Time taken by FRED is : %09f\n", time_taken);
 
-/*
+
 	// checking if the output image is empty
 	aux = 0;
-	bool not_empty_img = false;
+	unsigned not_empty_img = 0;
 	for (i = 0; i < IMG_HEIGHT; i++){
 		for (j = 0; j < IMG_WIDTH; j++)	{
-			pixel32 = U32_PACK(bmp_out.data[aux+3],bmp_out.data[aux+2],bmp_out.data[aux+1],bmp_out.data[aux]);
+			pixel32 = U32_PACK(0,img_out[aux+2],img_out[aux+1],img_out[aux]);
 			if (pixel32 != 0){
-				not_empty_img = true;
+				not_empty_img = 1;
 				break;
 			}
-			aux +=4;
+			aux +=3;
 		}
 		if (not_empty_img){
 			break;
@@ -228,22 +190,22 @@ int main (int argc, char **argv)
 
 	if (not_empty_img){
 		// if the img is not empty, then compare the hw output w the sw reference
-		if (memcmp(expected_out, mem_out,IMG_WIDTH*IMG_HEIGHT)){
-			std::cout << "Mismatch!\n";
+		if (memcmp(gray, img_out,IMG_WIDTH*IMG_HEIGHT*3)){
+			printf("Mismatch!\n");
 			error_code = 1;
 		}else{
-			std::cout << "Match!\n";
+			printf("Match!\n");
 		}
 		// print only the 10 initial lines of the images
-		std::cout << "Expected value: ";
-		print_img((data_t*)expected_out, IMG_WIDTH,5,true);
-		std::cout << "Output value  : ";
-		print_img((data_t*)mem_out, IMG_WIDTH,IMG_HEIGHT);
+		printf("Expected value: ");
+		//print_img((byte*)gray, IMG_WIDTH,5,1);
+		printf("Output value  : ");
+		//print_img((byte*)img_out, IMG_WIDTH,5,1);
 	}else{
-		std::cout << "Mismatch - Empty output image!\n";
+		printf("Mismatch - Empty output image!\n");
 		error_code = 1;
 	}
-*/
+
 	// this loop is required just to avoid messing up with the printed messages 
 	// caused by the messages printed by fred_free
 	for(i=0;i<100000000;i++);
