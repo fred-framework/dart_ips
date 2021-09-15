@@ -28,8 +28,8 @@ static const args_t MODULE_ID = 100;
 //static const unsigned int IMG_WIDTH = 64;
 //static const unsigned int IMG_HEIGHT = 48;
 
-static const unsigned int IMG_WIDTH = 32;
-static const unsigned int IMG_HEIGHT = 32;
+static const unsigned int IMG_WIDTH = 512;
+static const unsigned int IMG_HEIGHT = 512;
 
 void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out, args_t args0, args_t args1);
 

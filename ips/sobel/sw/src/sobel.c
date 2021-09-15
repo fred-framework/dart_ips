@@ -19,6 +19,8 @@ typedef uint64_t data_t;
 static const unsigned int IMG_WIDTH = 512;
 static const unsigned int IMG_HEIGHT = 512;
 
+// these buffers should be of size IMG_WIDTH*IMG_HEIGHT*sizeof(data_t) because data_t encode one pixel RGB 
+// make sure that hw_tasks.csv has at least this buffer size. for 512 image it would be 2097152
 data_t *mem_in, *mem_out;
 
 const int hw_id = 100;
@@ -87,19 +89,21 @@ int main (int argc, char **argv)
 
     byte *rgb,
          *gray,
+// these are not used, but kept to avoid changing the original code
          *sobel_h_res,
          *sobel_v_res,
          *contour_img;
+	// has FRED ouput image
+	byte img_out[IMG_WIDTH*IMG_HEIGHT*3];
 
     int width = IMG_WIDTH;
     int height = IMG_HEIGHT;
-	int rgb_size = width*height*3;
+    int rgb_size = width*height*3;
 
     // File names
     strcpy(file_in,"src/reference/imgs/img.rgb");
     strcpy(file_out,"src/reference/imgs/img_out.gray");
 
-/*
 	// fred related data structures and setup
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
@@ -127,7 +131,6 @@ int main (int argc, char **argv)
 		printf("fred_map_buff failed on buff 1 for mem_out\n");
 		error_code = 1;
 	}
-*/
 
     // Read file to rgb and get size
     readFile(file_in, &rgb, rgb_size);
@@ -153,6 +156,7 @@ int main (int argc, char **argv)
 	bmp_out.fill_region(0, 0, IMG_WIDTH, IMG_HEIGHT, 0, 0, 0, 0);
 	// the image is save in the dir ips/sobel/hw/sobel/solution_0/csim/build
 	bmp.write("input.bmp");	
+*/
 
 	// copying the bmp data into the hw buffer with data_t format
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -161,11 +165,13 @@ int main (int argc, char **argv)
 		for (j = 0; j < IMG_WIDTH; j++)	{
 			// 32bits alpha, r, g, b is transformed into data_t/64bits alpha, r, g, b
 			// very unoptimised encoding
-			pixel32 = U32_PACK(bmp.data[aux+3],bmp.data[aux+2],bmp.data[aux+1],bmp.data[aux]);
+			//pixel32 = U32_PACK(bmp.data[aux+3],bmp.data[aux+2],bmp.data[aux+1],bmp.data[aux]);
+			pixel32 = U32_PACK(0,rgb[aux+2],rgb[aux+1],rgb[aux]);
+			//printf("%d - %d - %d\n",j + IMG_HEIGHT * i,i,j);
 			mem_in[j + IMG_HEIGHT * i] = (data_t)pixel32;
 			// if (i==0)
 			// 	printf ("%lld - %d - (%d,%d,%d,%d)\n", mem_in[j + IMG_HEIGHT * i], pixel32,bmp.data[aux],bmp.data[aux+1],bmp.data[aux+2],bmp.data[aux+3]);
-			aux +=4;
+			aux +=3;
 		}
 		
 	}
@@ -179,26 +185,30 @@ int main (int argc, char **argv)
 
 
 	// copying the hw buffer with data_t format into the bmp data format
+	aux = 0;
 	for (i = 0; i < IMG_HEIGHT; i++){
 		for (j = 0; j < IMG_WIDTH; j++)	{
 			// convert data_t/64bits alpha, r, g, b into 8bits alpha, r, g, b
 			pixel64 = mem_out[j + IMG_HEIGHT * i];
-			bmp_out.set_pixel(i,j,
-				(uint8_t)U32_B0(pixel64),(uint8_t)U32_B1(pixel64),
-				(uint8_t)U32_B2(pixel64),(uint8_t)U32_B3(pixel64));
+			// bmp_out.set_pixel(i,j,
+			// 	(uint8_t)U32_B0(pixel64),(uint8_t)U32_B1(pixel64),
+			// 	(uint8_t)U32_B2(pixel64),(uint8_t)U32_B3(pixel64));
+			img_out[i+2] = (uint8_t)U32_B2(pixel64);
+			img_out[i+1] = (uint8_t)U32_B1(pixel64);
+			img_out[i]   = (uint8_t)U32_B0(pixel64);
+			aux +=3;
 		}
 		
 	}
 	clock_gettime(CLOCK_MONOTONIC, &end);		
-	bmp_out.write("output.bmp");
+	//bmp_out.write("output.bmp");
 
 	// Calculating total time taken by the FPGA offloading.
-	double time_taken;
 	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
 	printf("Time taken by FRED is : %09f\n", time_taken);
 
-
+/*
 	// checking if the output image is empty
 	aux = 0;
 	bool not_empty_img = false;
@@ -239,7 +249,7 @@ int main (int argc, char **argv)
 	for(i=0;i<100000000;i++);
 
 	//cleanup and finish
-	//fred_free(fred);
+	fred_free(fred);
 	printf("Fred finished\n");
 
 	return(error_code);
