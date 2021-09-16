@@ -13,7 +13,7 @@ The columns refer to the existance of software example, the IP hardware descript
 | IP name                                      | sw ex. | hw lang | tb | FPGA |
 |----------------------------------------------|--------|---------|----|------|
 | [CRC](ips/crc/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
-| [fastx](ips/fastx/readme.md)                 |    Y   |   cpp   | Y  |  Y   |
+| [fastx](ips/fastx/readme.md)                 |    Y*  |   cpp   | Y* |  N   |
 | [FINN CNN](ips/finn/readme.md)               |    N   |   cpp   | N  |  N   |
 | [FIR](ips/fir/readme.md)                     |    Y   |   cpp   | Y  |  Y   |
 | [Lenet CNN](ips/lenet/readme.md)             |    Y   |   cpp   | Y  |  N   |
@@ -32,6 +32,8 @@ The columns refer to the existance of software example, the IP hardware descript
 | [amalthea_pipe](ips/amalthea_pipe/readme.md) |    N   |   vhd   | Y  |  N   |
 | [gmap](ips/gmap/readme.md)                   |    N   |   cpp   | N  |  N   |
 |                                              |        |         |    |      |
+
+* not self-checking
 
 ## Summary of Static Parts
 

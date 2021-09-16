@@ -14,10 +14,7 @@
 #define HW_MOD_HPP
 
 //const args_t MODULE_ID = 202;
-
-//const unsigned int MAT_SIZE = 64;
-//const int iterations = 30;
-const unsigned int MAT_SIZE = 4;
+const unsigned int MAT_SIZE = 64;
 const int iterations = 1;
 
 void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out,

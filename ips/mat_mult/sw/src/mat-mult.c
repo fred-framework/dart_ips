@@ -2,14 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include "fred_lib.h"
 
 typedef uint64_t data_t;
-
-const unsigned int MAT_SIZE = 4;
-
+const unsigned int MAT_SIZE = 64;
 data_t *mem_a, *mem_b,*mem_out;
-
 const int hw_id = 100;
 
 
@@ -50,6 +48,7 @@ int main (int argc, char **argv)
 	int retval;
 	int error_code = 0,idx,aux,i,j;
 	data_t mem_expected_out[MAT_SIZE*MAT_SIZE];
+	struct timespec start, end;
 
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
@@ -110,14 +109,30 @@ int main (int argc, char **argv)
 	}	
 
 	// Call fred IP
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	retval = fred_accel(fred, hw_ip);
 	if (retval) {
 		printf("fred_accel failed for hw-task %u\n", hw_id);
 		error_code = 1;
 	}
+	clock_gettime(CLOCK_MONOTONIC, &end);		
+
+	// Calculating total time taken by the FPGA offloading.
+	double time_taken;
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by FRED is : %09f\n", time_taken);
 
 	// generate the reference output
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	mat_mult_sw((data_t *)mem_a, (data_t *)mem_b, (data_t *)mem_expected_out, MAT_SIZE);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+
+	// Calculating total time taken by the program running in the CPU.
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by the CPU is : %09f\n", time_taken);
+
 
 	if (memcmp(mem_out, mem_expected_out, MAT_SIZE*MAT_SIZE*sizeof(data_t))){
 		printf("Mismatch!\n");
@@ -130,6 +145,10 @@ int main (int argc, char **argv)
 	print_mat((data_t *)mem_expected_out, MAT_SIZE);
 	printf("Output value  : ");
 	print_mat((data_t *)mem_out, MAT_SIZE);
+
+	// this loop is required just to avoid messing up with the printed messages 
+	// caused by the messages printed by fred_free
+	for(i=0;i<100000000;i++);
 
 	//cleanup and finish
 	fred_free(fred);
