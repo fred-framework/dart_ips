@@ -23,6 +23,4 @@ static const uint8_t ARGS_SIZE = 8;
 
 void sobel_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
-//void hw_task_1(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
-
 #endif /* SLOTS_HPP */

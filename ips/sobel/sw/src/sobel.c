@@ -190,16 +190,16 @@ int main (int argc, char **argv)
 
 	if (not_empty_img){
 		// if the img is not empty, then compare the hw output w the sw reference
-		if (memcmp(gray, img_out,IMG_WIDTH*IMG_HEIGHT*3)){
+		if (memcmp(gray, img_out,IMG_WIDTH*IMG_HEIGHT*3) != 0){
 			printf("Mismatch!\n");
 			error_code = 1;
 		}else{
 			printf("Match!\n");
 		}
 		// print only the 10 initial lines of the images
-		printf("Expected value: ");
+		printf("Expected value: \n");
 		//print_img((byte*)gray, IMG_WIDTH,5,1);
-		printf("Output value  : ");
+		printf("Output value: \n");
 		//print_img((byte*)img_out, IMG_WIDTH,5,1);
 	}else{
 		printf("Mismatch - Empty output image!\n");
