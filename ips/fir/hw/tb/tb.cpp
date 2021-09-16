@@ -26,36 +26,27 @@ void print_vect(data_t * base_idx, unsigned int size)
 	std::cout << std::endl;
 }
 
-
 int main (int argc, char **argv)
 {
-    const unsigned N = 10;
-    const unsigned OUT_BUFF_SIZE = BUFF_SIZE + FIR_WINDOW_SIZE - 1;
-    //const unsigned N = 25;
-
-	args_t id_out;
-	args_t args[ARGS_SIZE];
+    args_t id_out;
+    args_t args[ARGS_SIZE];
     data_t in_buff [BUFF_SIZE], out_buff[BUFF_SIZE];
     data_t out_buff_gold[BUFF_SIZE];
-    int error_code = 0,i,j;
+    int i,j,error_code = 0;
 
     //FIR coeff
-    int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
-    // int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74};
-    //int coeff[FIR_WINDOW_SIZE] = {13, -2};//, 9, 11, 26, 18, 95, -43, 6, 74};
+    data_t coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
 
-   //Shift registersint
-    int shift_reg[FIR_WINDOW_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    //int shift_reg[FIR_WINDOW_SIZE] ={0, 0};//, 0, 0, 0, 0, 0, 0, 0, 0};
-
+    //Shift registers
+    data_t shift_reg[FIR_WINDOW_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     //prepare input data
     for(i = 0; i < BUFF_SIZE; i++)
         in_buff[i] = (data_t) i;
 
-    // loop through each output
+    // running the reference output
     for (i = 0; i < BUFF_SIZE; i++ ) {
-        int acc = 0;
+        data_t acc = 0;
 
         // shift registers
         for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
@@ -82,10 +73,10 @@ int main (int argc, char **argv)
     }else{
         std::cout << "Match!\n";
     }
-    // print only the 10 initial lines of the images
-    std::cout << "Expected value: ";
+    // print only the 5 initial lines of the images
+    std::cout << "Expected value: \n";
     print_vect((data_t*)out_buff_gold, 5);
-    std::cout << "Output value  : ";
+    std::cout << "Output value  : \n";
     print_vect((data_t*)out_buff, 5);
 
     return error_code;
