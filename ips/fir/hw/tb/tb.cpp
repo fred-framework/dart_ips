@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cstring>
 
-const unsigned int BUFF_SIZE = 10;
-const unsigned int FIR_WINDOW_SIZE = 25;
+const unsigned int BUFF_SIZE = 4 * 1024;
+const unsigned int FIR_WINDOW_SIZE = 100;
 const unsigned int OUT_BUFF_SIZE = BUFF_SIZE + FIR_WINDOW_SIZE - 1;
 
 typedef uint32_t args_t;
@@ -35,7 +35,13 @@ int main (int argc, char **argv)
     int i,j,error_code = 0;
 
     //FIR coeff
-    data_t coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
+//    data_t coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
+    const data_t coeff[FIR_WINDOW_SIZE] = {
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
+		};
 
     //Shift registers
     data_t shift_reg[FIR_WINDOW_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

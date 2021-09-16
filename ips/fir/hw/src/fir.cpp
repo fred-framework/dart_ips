@@ -16,19 +16,22 @@ fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
                 in_buff[i] = mem_port_in[i];        
             }
 
-    //compute
-    //FIR window size
-    const unsigned N  = 25;
-
     int j, i;
 
     //FIR coeff
-    int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
+    int coeff[FIR_WINDOW_SIZE] = {
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
+        };
     //int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74};
 
     //Shift registersint
-    int shift_reg[FIR_WINDOW_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    //int shift_reg[FIR_WINDOW_SIZE] ={0, 0};//, 0, 0, 0, 0, 0, 0, 0, 0};
+    int shift_reg[FIR_WINDOW_SIZE] = {0};
+    for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+        shift_reg[j] = 0;
+    }
 
     // loop through each output
     for (i = 0; i < BUFF_SIZE; i++ ) {

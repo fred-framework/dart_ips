@@ -6,8 +6,8 @@
 #include <time.h>
 #include "fred_lib.h"
 
-#define BUFF_SIZE 10
-#define FIR_WINDOW_SIZE 25
+#define BUFF_SIZE 4 * 1024
+#define FIR_WINDOW_SIZE 100
 #define OUT_BUFF_SIZE = BUFF_SIZE + FIR_WINDOW_SIZE - 1
 
 typedef uint32_t args_t;
@@ -36,6 +36,7 @@ int main (int argc, char **argv)
 	struct fred_data *fred;
 	struct fred_hw_task *hw_ip;
 	const int hw_id = 100;
+	// MAKE SURE the FRED buffers have size > of BUFF_SIZE*sizeof(data_t)
 	data_t *in_buff;
 	data_t *out_buff;
 
@@ -43,7 +44,12 @@ int main (int argc, char **argv)
 	double time_taken;
 
     //FIR coeff
-    const data_t coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
+    const data_t coeff[FIR_WINDOW_SIZE] = {
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
+		};
 
     //Shift registers
     data_t shift_reg[FIR_WINDOW_SIZE];
@@ -123,9 +129,9 @@ int main (int argc, char **argv)
 		printf("Match!\n");
 	}
 
-	printf("Reference output out_buff_gold[0:9]:\n");
+	printf("Expected value[0:9]:\n");
 	print_vect(out_buff_gold, 10);
-	printf("FRED output out_buff[0:9]:\n");
+	printf("Output value[0:9]:\n");
 	print_vect(out_buff, 10);
 
 	// this loop is required just to avoid messing up with the printed messages 

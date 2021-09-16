@@ -13,8 +13,8 @@ const args_t MODULE_ID = 202;
 
 //const unsigned int MAT_SIZE = 64;
 //const int iterations = 30;
-const unsigned int BUFF_SIZE = 10;
-const unsigned int FIR_WINDOW_SIZE = 25;
+const unsigned int BUFF_SIZE = 4 * 1024;
+const unsigned int FIR_WINDOW_SIZE = 100;
 const unsigned int OUT_BUFF_SIZE = BUFF_SIZE + FIR_WINDOW_SIZE - 1;
 const int iterations = 1;
 
