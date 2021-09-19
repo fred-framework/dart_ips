@@ -126,6 +126,11 @@ int main(int argc, char *argv[]) {
     // Write sobel img to a file
     writeFile(file_out, contour_img, gray_size);
 
+    free(gray);
+    free(sobel_h_res);
+    free(sobel_v_res);
+    free(contour_img);
+
     return 0;
 }
 

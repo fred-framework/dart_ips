@@ -54,6 +54,10 @@ Fred finished
 |   DSP48E1 only |    3 |       |           |       |
 
 
+# Performance
+
+The estimated latency is 266785 clock cycles or 2.668 ms assuming 10ns clock period. 
+
 ## Software Requirements
 
 The linux `convert` command is required for testing this IP. Install it with:
