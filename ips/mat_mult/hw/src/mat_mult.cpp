@@ -26,8 +26,8 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 
 	//*id = MODULE_ID;
 
-	#pragma HLS ARRAY_PARTITION variable=mat_a cyclic factor=MAT_SIZE dim=2
-	#pragma HLS ARRAY_PARTITION variable=mat_b cyclic factor=MAT_SIZE dim=1
+	#pragma HLS ARRAY_PARTITION variable=mat_a cyclic factor=4 dim=2
+	#pragma HLS ARRAY_PARTITION variable=mat_b cyclic factor=4 dim=1
 
 	//#pragma HLS dataflow
 	//#pragma HLS ALLOCATION instances=MulnS limit=4 core
