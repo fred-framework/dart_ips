@@ -14,11 +14,11 @@ static const uint8_t ARGS_SIZE = 8;
 #define OUT_MEM_SIZE 16
 #define EXEC_CYCLES 128
 
+#define MAX(x,y) ( (x) > (y) ? (x) : (y) )
 // do not change this part
-#define IN_MEM_SIZE_BYTE (sizeof(data_t) * IN_MEM_SIZE)
-#define OUT_MEM_SIZE_BYTE (sizeof(data_t) * OUT_MEM_SIZE)
 // the input and output time does not count in the prem model; 20 is the constant additional latency of the internal pipeline. with this constant, the final latency match with EXEC_CYCLES
-#define EXEC_SIZE EXEC_CYCLES-20-IN_MEM_SIZE-OUT_MEM_SIZE
+#define EXEC_SIZE MAX(0,EXEC_CYCLES-20-IN_MEM_SIZE-OUT_MEM_SIZE)
+
 void prem_config_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
@@ -59,25 +59,9 @@ int main()
 	args_t args[ARGS_SIZE];
 	int error_code = 0;
 
-	data_t mem_in[AXIM_MAX_DATA_SIZE]; // lets make sure that all the input buffer is initialized, even if it is not entirely used
+	data_t mem_in[IN_MEM_SIZE+3]; // lets make sure that all the input buffer is initialized, even if it is not entirely used
 	data_t mem_out[OUT_MEM_SIZE];
 	data_t expected_mem_out[OUT_MEM_SIZE];
-
-	// checking configuration
-	if (EXEC_SIZE <= 0){
-		std::cout << "EXEC_SIZE must be positive\n";
-		return 1;
-	}
-
-	if (AXIM_MAX_DATA_SIZE-(IN_MEM_SIZE +3) <= 0){
-		std::cout << "IN_MEM_SIZE is too large for the current hw FIFO size\n";
-		return 1;
-	}
-
-	if (AXIM_MAX_DATA_SIZE-OUT_MEM_SIZE <= 0){
-		std::cout << "OUT_MEM_SIZE is too large for the current hw FIFO size\n";
-		return 1;
-	}
 
 	// Set hw accelerator args
 	// The base address is the memory array start address
@@ -89,7 +73,7 @@ int main()
 	mem_in[1]=EXEC_SIZE;
 	mem_in[2]=OUT_MEM_SIZE;
 	// assuming the input vector is filled with 'ones' 
-	init_vect(&(mem_in[3]), 1, AXIM_MAX_DATA_SIZE);
+	init_vect(&(mem_in[3]), 1, IN_MEM_SIZE);
 
 	// C/RTL cosim requires at least two executions of the design under test
 	prem_config_top(&id_out, args, mem_in, mem_out);
@@ -97,8 +81,8 @@ int main()
 	//prem_config_top(&id_out, args, mem_in, mem_out);
 
 	// calculate the expected value
-	for (i = 0; i < IN_MEM_SIZE; ++i) {
-		count_input_val += mem_in[i+3];
+	for (i = 3; i < IN_MEM_SIZE+3; ++i) {
+		count_input_val += mem_in[i];
 	}
 	lfsr = count_input_val;
 	printf("in: 0x%lX\n", (long unsigned)lfsr);
@@ -112,7 +96,7 @@ int main()
 	}
 	printf("out: 0x%lX\n", (long unsigned)lfsr);
 
-	//validate
+	// validate
 	if (check_output(mem_out, expected_mem_out, OUT_MEM_SIZE) != 1){
 		std::cout << "Mismatch!\n";
 		error_code = 1;
@@ -130,4 +114,3 @@ int main()
 
 	return(error_code);
 }
-

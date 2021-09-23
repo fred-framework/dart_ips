@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 #include "fred_lib.h"
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
@@ -76,6 +77,8 @@ int main (int argc, char **argv)
 	int error_code = 0;
 	data_t count_input_val=0;
 	data_t expected_mem_out[OUT_MEM_SIZE];
+	struct timespec start, end;
+	double time_taken;
     
 	retval = fred_init(&fred);
 	if (retval) {
@@ -105,27 +108,41 @@ int main (int argc, char **argv)
 	init_vect(mem_in, 1, AXIM_MAX_DATA_SIZE);
 
 	// Call fred IP
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	retval = fred_accel(fred, hw_ip);
 	if (retval) {
 		printf("fred_accel failed \n");
 		error_code = 1;
-	}		
+	}
+	clock_gettime(CLOCK_MONOTONIC, &end);		
+
+	// Calculating total time taken by the FPGA offloading.
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by FRED is : %09f\n", time_taken);
 
 	// calculate expected value
+	clock_gettime(CLOCK_MONOTONIC, &start);
 	for (i = 0; i < IN_MEM_SIZE; ++i) {
 		count_input_val += mem_in[i];
 	}
 	lfsr = count_input_val;
-	printf("in: 0x%lX\n", (long unsigned)lfsr);
+	//printf("in: 0x%lX\n", (long unsigned)lfsr);
 	for (i = 0; i < EXEC_SIZE; ++i) {
 		lfsr = pseudo_random(lfsr);
 	}
-	printf("exec: 0x%lX\n", (long unsigned)lfsr);
+	//printf("exec: 0x%lX\n", (long unsigned)lfsr);
 	for (i = 0; i < OUT_MEM_SIZE; ++i) {
 		expected_mem_out[i] = lfsr;
 		lfsr = pseudo_random(lfsr);		
 	}
-	printf("out: 0x%lX\n", (long unsigned)lfsr);
+	//printf("out: 0x%lX\n", (long unsigned)lfsr);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+
+	// Calculating total time taken by the program running in the CPU.
+	time_taken = (end.tv_sec - start.tv_sec) * 1e9;
+	time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+	printf("Time taken by the CPU is : %09f\n", time_taken);
 
 	// validation
 	if (check_output(mem_out, expected_mem_out, OUT_MEM_SIZE) != 1){

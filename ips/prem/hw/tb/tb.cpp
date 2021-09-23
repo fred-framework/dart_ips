@@ -63,22 +63,6 @@ int main()
 	data_t mem_out[OUT_MEM_SIZE];
 	data_t expected_mem_out[OUT_MEM_SIZE];
 
-	// checking configuration
-//	if (EXEC_SIZE <= 0){
-//		std::cout << "EXEC_SIZE must be positive\n";
-//		return 1;
-//	}
-
-//	if (AXIM_MAX_DATA_SIZE-IN_MEM_SIZE <= 0){
-//		std::cout << "IN_MEM_SIZE is too large for the current hw FIFO size\n";
-//		return 1;
-//	}
-//
-//	if (AXIM_MAX_DATA_SIZE-OUT_MEM_SIZE <= 0){
-//		std::cout << "OUT_MEM_SIZE is too large for the current hw FIFO size\n";
-//		return 1;
-//	}
-
 	// Set hw accelerator args
 	// The base address is the memory array start address
 	args[0] = (args_t)0;
@@ -87,16 +71,16 @@ int main()
 	// assuming the input vector is filled with 'ones' 
 	init_vect(mem_in, 1, IN_MEM_SIZE);
 
-	printf("before top\n");
+	//printf("before top\n");
 	// C/RTL cosim requires at least two executions of the design under test
 	prem_top(&id_out, args, mem_in, mem_out);
 	// uncomment if you want to simulate 2 flows
 	//prem_top(&id_out, args, mem_in, mem_out);
-	printf("after top\n");
+	//printf("after top\n");
 
 	// calculate the expected value
 	for (i = 0; i < IN_MEM_SIZE; ++i) {
-		count_input_val += mem_in[i%AXIM_MAX_DATA_SIZE];
+		count_input_val += mem_in[i];
 	}
 	lfsr = count_input_val;
 	printf("in: 0x%lX\n", (long unsigned)lfsr);
