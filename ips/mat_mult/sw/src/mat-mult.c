@@ -6,7 +6,7 @@
 #include "fred_lib.h"
 
 typedef uint64_t data_t;
-const unsigned int MAT_SIZE = 16;
+const unsigned int MAT_SIZE = 32;
 data_t *mem_a, *mem_b,*mem_out;
 const int hw_id = 100;
 

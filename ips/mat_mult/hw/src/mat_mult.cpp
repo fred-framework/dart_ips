@@ -13,6 +13,7 @@
 */
 
 #include <cstring>
+#include <stdint.h>
 #include "mat_mult_top.hpp"
 #include "mat_mult.hpp"
 
@@ -23,10 +24,10 @@
 void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out,
 			args_t args0, args_t args1, args_t args2)
 {
-	data_t mat_a[MAT_SIZE][MAT_SIZE];
-	data_t mat_b[MAT_SIZE][MAT_SIZE];
+	int_data_t mat_a[MAT_SIZE][MAT_SIZE];
+	int_data_t mat_b[MAT_SIZE][MAT_SIZE];
 	data_t mat_p[MAT_SIZE][MAT_SIZE];
-	data_t result, mult;
+	int_data_t result, mult;
 
 	// factor of 4 cause these warnings below which means that the latency is suboptimal due to the lack of enough memory ports to read/write form the memories
 	// WARNING: [SCHED 204-69] Unable to satisfy resource constraint for operation type mul(II = 1)..
@@ -41,14 +42,20 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 	// #pragma HLS ARRAY_PARTITION variable=mat_b complete dim=1
 
 	// Burst reads on input matrices from DDR memory
-	// Burst read for matrix A, and B 
-	std::memcpy((void *)mat_a,
-				(const void *)( mem_port_in + args0 / sizeof(data_t) ),
-				MAT_SIZE * MAT_SIZE * sizeof(data_t));
-
-	std::memcpy((void *)mat_b,
-				(const void *)( mem_port_in + args1 / sizeof(data_t) ),
-				MAT_SIZE * MAT_SIZE * sizeof(data_t));
+	// Burst read for matrix A, and B
+    read_data: for(int itr = 0 , i = 0 , j =0; itr < MAT_SIZE * MAT_SIZE; itr++, j++){
+    	#pragma HLS PIPELINE
+        if(j == MAT_SIZE) { j = 0 ; i++; }
+        mat_a[i][j] = (int_data_t)mem_port_in[itr + args0 / sizeof(data_t)];
+        mat_b[i][j] = (int_data_t)mem_port_in[itr + args1 / sizeof(data_t)];
+    }
+//	std::memcpy((void *)mat_a,
+//				(const void *)( mem_port_in + args0 / sizeof(data_t) ),
+//				MAT_SIZE * MAT_SIZE * sizeof(data_t));
+//
+//	std::memcpy((void *)mat_b,
+//				(const void *)( mem_port_in + args1 / sizeof(data_t) ),
+//				MAT_SIZE * MAT_SIZE * sizeof(data_t));
 
 	// this limits the number of parallel multiplication it can handle.
 	// increasing this value will increase the number of DSP but decrease the latency
@@ -77,7 +84,7 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 				mult = mat_a[i][k] * mat_b[k][j];
 				result += mult;
 			}
-			mat_p[i][j] = result;
+			mat_p[i][j] = (data_t)result;
 		}
 	}
 

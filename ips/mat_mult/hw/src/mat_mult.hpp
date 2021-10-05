@@ -17,7 +17,11 @@
 
 // tested on the pynq board with sizes 8, 16, 32
 // with size 64, the design reaches the limit of the Pynq board and it is not feasible;
-#define MAT_SIZE 16
+#define MAT_SIZE 32
+
+// Although "data_t" cannot be changed to work w DART, the internal data size can be changed
+//  to save resources. Change "int_data_t" accordingly to change the internal data size.
+typedef uint64_t int_data_t;
 
 // ****************************************************************
 // Implementation parameters to play with area vs latency tradeoff
@@ -48,6 +52,8 @@
 	const unsigned int ALLOCATION_LIMIT = 8;
 #else
 	#warning "mat_mult configuration not tested in the FPGA"
+	const unsigned int PARTITION_FACTOR = 4;
+	const unsigned int ALLOCATION_LIMIT = 2;
 #endif
 
 
