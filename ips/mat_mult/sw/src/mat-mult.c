@@ -6,7 +6,7 @@
 #include "fred_lib.h"
 
 typedef uint64_t data_t;
-const unsigned int MAT_SIZE = 64;
+const unsigned int MAT_SIZE = 16;
 data_t *mem_a, *mem_b,*mem_out;
 const int hw_id = 100;
 
@@ -145,6 +145,22 @@ int main (int argc, char **argv)
 	print_mat((data_t *)mem_expected_out, MAT_SIZE);
 	printf("Output value  : ");
 	print_mat((data_t *)mem_out, MAT_SIZE);
+
+	// idx=0;
+	// int errors=0;
+	// for (i=0;i<MAT_SIZE;i++){
+	// 	for (j=0;j<MAT_SIZE;j++){
+	// 		if (mem_expected_out[idx] != mem_out[idx]){
+	// 			printf("expected[%d] != out[%d] => %lld != %lld\n",idx,idx,mem_expected_out[idx], mem_out[idx]);
+	// 			errors++;
+	// 		}
+	// 		idx++;
+	// 		if (errors>30)
+	// 			break;		
+	// 	}
+	// 	if (errors>30)
+	// 		break;
+	// }
 
 	// this loop is required just to avoid messing up with the printed messages 
 	// caused by the messages printed by fred_free

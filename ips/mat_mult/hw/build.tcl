@@ -13,7 +13,7 @@ open_project -reset $prj_name
 # HW-task files
 add_files src/mat_mult_top.cpp
 add_files src/mat_mult.cpp
-add_file -tb tb/tb.cpp
+add_files -tb tb/tb.cpp
 
 # the generic part of the HLS script
 source ../../../scripts/ip_hls.tcl

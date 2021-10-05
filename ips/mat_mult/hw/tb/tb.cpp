@@ -5,7 +5,7 @@
 typedef uint32_t args_t;
 typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
-const unsigned int MAT_SIZE = 64;
+const unsigned int MAT_SIZE = 16;
 
 void mat_mult_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
