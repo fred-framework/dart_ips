@@ -109,12 +109,16 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 	data_t pix;
 	for (int i = 0; i<IMG_HEIGHT; i++)
 	{
-		for (int j = 0; j<IMG_WIDTH; j++)
+		uint8_t gray_pix;
+		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
-			#pragma HLS PIPELINE
-			pix = img_in[itr];
-			// avoid floating point match, but produces a image a bit darker
-			src_img[itr] = U32_B0(pix)>>2 + U32_B1(pix)>>1 + U32_B2(pix)>>2;
+			#pragma HLS PIPELINE rewind
+			pix = mem_in[itr];
+			// avoid floating point match, but produces an image a bit darker
+			gray_pix = U32_B0(pix)>>2 + U32_B1(pix)>>1 + U32_B2(pix)>>2;
+			src_img[itr] = gray_pix;
+			// copy the input gray image
+			dest_img[itr] = gray_pix;
 			itr++;
 		}
 	}

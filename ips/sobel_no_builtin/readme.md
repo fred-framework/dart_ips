@@ -75,6 +75,11 @@ sudo apt install imagemagick
 
 ## TO DO
 
+how to model image filters
+https://github.com/Xilinx/HLx_Examples/tree/master/Vision/video_edge
+https://github.com/Xilinx/HLx_Examples/blob/master/Vision/video_edge/image_filter.cpp
+https://github.com/ATaylorCEngFIET/Hackster/blob/master/Sobel/cvt_colour.cpp
+
 sobel
 https://github.com/Mr-Anderson/turtlebot_360/blob/master/pre_vis_proc/src/pre_vis_proc.cpp
 https://github.com/Nishida-Lab/rosbook_pkgs/blob/master/chapter7/test_opencv/src/test_edge_detection.cpp

@@ -265,14 +265,16 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 	data_t pix;
 	data_in1:for (int i = 0; i<IMG_HEIGHT; i++)
 	{
+		uint8_t gray_pix;
 		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
-			#pragma HLS PIPELINE
+			#pragma HLS PIPELINE rewind
 			pix = mem_in[itr];
-			// avoid floating point match, but produces a image a bit darker
-			src_img[itr] = U32_B0(pix)>>2 + U32_B1(pix)>>1 + U32_B2(pix)>>2;
-			// copy the input image
-			dest_img[itr] = src_img[itr];
+			// avoid floating point match, but produces an image a bit darker
+			gray_pix = U32_B0(pix)>>2 + U32_B1(pix)>>1 + U32_B2(pix)>>2;
+			src_img[itr] = gray_pix;
+			// copy the input gray image
+			dest_img[itr] = gray_pix;
 			itr++;
 		}
 	}
