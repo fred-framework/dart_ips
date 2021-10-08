@@ -87,6 +87,24 @@ https://github.com/vineet0814/Edge-detection-using-Canny-Sobel-and-Laplace/blob/
 
 sobel no opencv
 https://github.com/hkclki/Sobel-Filter/blob/master/opencvpjt_img/main.cpp
+https://github.com/yuryybk/opencv-basic-samples/blob/master/Sobel/Sobel.cpp
+
+A Comparison of the Sobel Filter in C, OpenCV and CUDA
+https://danyele.github.io/lecture_notes/SPD_Project_Report_Daniele_Gadler_5_0.pdf
+https://github.com/DanyEle/Sobel_Filter/tree/master/Native_Sobel
+https://github.com/DanyEle/Sobel_Filter/tree/master/OpenCV_Sobel
+
+sobel in C
+https://github.com/fzehracetin/sobel-edge-detection-in-c/blob/main/sobel_edge_detection.c
+https://github.com/tahtaciburak/edge-detection/blob/84af3e8a551ef262f94b3be36856b436124f52fe/main.c#L159
+https://github.com/erayzeki/SobelFilter/blob/dc3d7ff72bf8e2311e86c7c3c03472a7a997b121/sobel.c#L126
+https://github.com/BrianCotter/SobelC/blob/main/sobel.c
+https://github.com/BrianCotter/SobelC/blob/main/convolve.c
+
+
+sobel in C - no multiplication
+https://github.com/mjpatter88/SobelEdgeDetection/blob/master/sobel.c
+
 
 canny
 https://github.com/metinkadik/RosOpencv-EdgeDetection/blob/master/opencv_ros/src/image.cpp
