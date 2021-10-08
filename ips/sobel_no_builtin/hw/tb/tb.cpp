@@ -44,6 +44,49 @@ void sobel_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, vola
 #define ABS(x) ((x)>0?(x):-(x))
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
+
+// assign a lower height to print the image partially
+void print_img(void *base_idx, unsigned int width, unsigned int height, uint8_t gray)
+{
+	int i,j;
+	std::cout << "[ \n";
+	for (i = 0; i < height; ++i) {
+		for (j = 0; j < width; ++j) {
+			if (gray==1){
+				printf("0x%02X ",(uint8_t)((uint8_t*)base_idx)[j + width * i]);
+			}
+			else{
+				printf("0x%016lX ",(data_t)((data_t*)base_idx)[j + width * i]);
+			}
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "]" << std::endl;
+}
+
+
+void save_img(const char *filename, const uint8_t *image){
+
+	// the image is save in the dir ips/sobel/hw/sobel/solution_0/csim/build
+	// run the following command to convert the file to a image format
+	FILE *fout = fopen(filename,"wb");
+	if(fout == NULL)
+	{
+		printf("ERROR: gray image %s cannot be saved!\n",filename);
+		exit(1);
+	}
+	uint32_t wbytes = fwrite(image,1,IMG_WIDTH*IMG_HEIGHT,fout);
+	if (wbytes != IMG_WIDTH*IMG_HEIGHT)
+	{
+		printf("ERROR: gray image size is %d but the expected is %d!\n", wbytes, IMG_WIDTH*IMG_HEIGHT);
+		exit(1);
+	}
+	fclose(fout);
+	// convert -size 512x512 -depth 8 ./sobel/lat-in/csim/build/ref_output.gray img_out.png
+	//system("/usr/bin/convert -size 512x512 -depth 8 ./output.gray ./output.png");
+}
+
+
 // reference function
 void sobel(uint8_t *img_in, uint8_t *img_out){
 	const int sobel_x[3][3] = {
@@ -95,20 +138,29 @@ void sobel(uint8_t *img_in, uint8_t *img_out){
 			// 	(sobel_y[2][0] * img_in[j*IMG_WIDTH+2]) + (sobel_y[2][1] * img_in[(j+1)*IMG_WIDTH+2]) + (sobel_y[2][2] * img_in[(j+2)*IMG_WIDTH+2]);
 
 
+			if(pixval_x < 0)
+			{
+				pixval_x = -pixval_x;
+			}
+			if(pixval_y < 0)
+			{
+				pixval_y = -pixval_y;
+			}
+			img_out[j*IMG_WIDTH+i] = pixval_x + pixval_y ;
 
 			//int sum = ABS(pixval_x) + ABS(pixval_y);
-			int sum = ABS(pixval_x + pixval_y);
-			if (sum > 255)
-			{
-				sum = 255; //for best performance
-			}
-			img_out[j*IMG_WIDTH+i] = (uint8_t)sum;
+//			int sum = ABS(pixval_x + pixval_y);
+//			if (sum > 255)
+//			{
+//				sum = 255; //for best performance
+//			}
+//			img_out[j*IMG_WIDTH+i] = (uint8_t)sum;
 
 			// rolling the windows maximizing internal memory reuse and minimizing the input bandwidth
-			idx += i;
-			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[idx];
-			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[idx+1];
-			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[idx+2];
+			//idx += i;
+			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[idx+i];
+			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[idx+i+1];
+			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[idx+i+2];
 
 			// window_o[0][0] = window_o[0][1]; window_o[0][1] = window_o[0][2]; window_o[0][2] = img_out[idx];
 			// window_o[1][0] = window_o[1][1]; window_o[1][1] = window_o[1][2]; window_o[1][2] = img_out[idx+1];
@@ -123,28 +175,33 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 
 	uint32_t itr = 0;
 	data_t pix;
+	int red,green,blue;
+	uint8_t *img_ptr = (uint8_t *)img_in;
 	for (int i = 0; i<IMG_HEIGHT; i++)
 	{
 		uint8_t gray_pix;
-		uint32_t gray_pix_32;
 		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
 			#pragma HLS PIPELINE rewind
-			pix = img_in[itr];
-			// avoid floating point match, but produces an image a bit darker
-			gray_pix_32 = ((uint8_t)U32_B0(pix)>>2) + ((uint8_t)U32_B1(pix)>>1) + ((uint8_t)U32_B2(pix)>>2);
-			// clamp at most to 0xFF
-			gray_pix = MIN(gray_pix_32,255);
-			//if (pix!=0)
-			//{
-			//	printf("0x%08X (0x%02X): 0x%02X 0x%02X 0x%02X\n",pix, gray_pix, U32_B0(pix)>>2, U32_B1(pix)>>1, U32_B2(pix)>>2);
-			//}
-			src_img[itr] = gray_pix;
-			// copy the input gray image
-			dest_img[itr] = gray_pix;
+            red = (unsigned char)*(img_ptr++);
+            green = (unsigned char)*(img_ptr++);
+            blue =(unsigned char)*(img_ptr++);
+			// avoid floating point math, but produces an image a bit darker
+            // original conversion
+			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
+			src_img[itr] = (uint8_t)(red>>2) + (uint8_t)(green>>1) + (uint8_t)(blue>>2);
+
+			// alternative solution
+			// pix = img_in[itr];
+			// gray_pix = ((uint8_t)(U32_B0(pix)>>2)) + ((uint8_t)(U32_B1(pix)>>1)) + ((uint8_t)(U32_B2(pix)>>2));
+			// src_img[itr] = gray_pix;
+
+			// jump by the 5 unused bytes of data_t
+			img_ptr +=5;
 			itr++;
 		}
 	}
+	//save_img("gray.gray",src_img);
 
 	sobel(src_img,dest_img);
 
@@ -158,25 +215,6 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 			itr++;
 		}
 	}		
-}
-
-// assign a lower height to print the image partially
-void print_img(void *base_idx, unsigned int width, unsigned int height, uint8_t gray)
-{
-	int i,j;
-	std::cout << "[ \n";
-	for (i = 0; i < height; ++i) {
-		for (j = 0; j < width; ++j) {
-			if (gray==1){
-				printf("0x%02X ",(uint8_t)((uint8_t*)base_idx)[j + width * i]);
-			}
-			else{
-				printf("0x%016lX ",(data_t)((data_t*)base_idx)[j + width * i]);
-			}
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "]" << std::endl;
 }
 
 
@@ -298,32 +336,8 @@ int main()
 	print_img((uint8_t*)mem_out_8UC1, IMG_WIDTH,5,1);
 
 #ifdef WITH_SAVE_OUTPUT
-	// the image is save in the dir ips/sobel/hw/sobel/solution_0/csim/build
-	// run the following command to convert the file to a image format
-	FILE *fout = fopen("output.gray","wb");
-	FILE *fref_out = fopen("ref_output.gray","wb");
-	if(fout == NULL || fref_out == NULL)
-	{
-		printf("ERROR: gray image cannot be saved!\n");
-		exit(1);             
-	}
-	uint32_t wbytes = fwrite(mem_out_8UC1,1,IMG_WIDTH*IMG_HEIGHT,fout);
-	if (wbytes != IMG_WIDTH*IMG_HEIGHT)
-	{
-		printf("ERROR: gray image size is %d but the expected is %d!\n", wbytes, IMG_WIDTH*IMG_HEIGHT);
-		exit(1);
-	}
-	wbytes = fwrite(expected_out_8UC1,1,IMG_WIDTH*IMG_HEIGHT,fref_out);
-	if (wbytes != IMG_WIDTH*IMG_HEIGHT)
-	{
-		printf("ERROR: gray image size is %d but the expected is %d!\n", bytes, IMG_WIDTH*IMG_HEIGHT);
-		exit(1);
-	}
-	fclose(fout);
-	fclose(fref_out);
-	// convert -size 512x512 -depth 8 ./sobel/lat-in/csim/build/ref_output.gray img_out.png
-	//system("/usr/bin/convert -size 512x512 -depth 8 ./ref_output.gray ./ref_output.png");
-	//system("/usr/bin/convert -size 512x512 -depth 8 ./output.gray ./output.png");
+	save_img("output.gray",mem_out_8UC1);
+	save_img("reference.gray",expected_out_8UC1);
 #endif
 
 
