@@ -88,90 +88,98 @@ void save_img(const char *filename, const uint8_t *image){
 
 
 // reference function
-void sobel(uint8_t *img_in, uint8_t *img_out){
-	const int sobel_x[3][3] = {
-			{-1,0,1},
-			{-2,0,2},
-			{-1,0,1}
-		};
-	const int sobel_y[3][3] = {
-			{-1,-2,-1},
-			{0,0,0},
-			{1,2,1}
-	};
+void sobel(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IMG_WIDTH]){
 	uint8_t window_i[3][3];
-	// uint8_t window_o[3][3];
-	uint32_t idx;
+	uint32_t row,col,curMax;
+	int sum1,sum2;
 
-	for (int j = 0; j<IMG_HEIGHT-2; j++)
+	const int height = IMG_HEIGHT;
+	const int width = IMG_WIDTH;
+
+    // set the edges to black
+	for(row=1; row < height-1; row++)
+	{
+        img_out[row][0] = 0;
+        img_out[row][width-1] = 0;
+    }	
+	for(col=0; col < width; col++)
+	{
+        img_out[0][col] = 0;
+        img_out[height-1][col] = 0;
+    }
+
+	// apply the filter using a rolling window
+	for(row=1; row < height-1; row++)
 	{
 		// loading the initial values of the rolling windows
-		window_i[0][0] = img_in[j*IMG_WIDTH+0]; window_i[0][1] = img_in[(j+1)*IMG_WIDTH+0] ; window_i[0][2] = img_in[(j+2)*IMG_WIDTH+0];
-		window_i[1][0] = img_in[j*IMG_WIDTH+1]; window_i[1][1] = img_in[(j+1)*IMG_WIDTH+1] ; window_i[1][2] = img_in[(j+2)*IMG_WIDTH+1];
-		window_i[2][0] = img_in[j*IMG_WIDTH+2]; window_i[2][1] = img_in[(j+1)*IMG_WIDTH+2] ; window_i[2][2] = img_in[(j+2)*IMG_WIDTH+2];
+		window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
+		window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
+		window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
 
-		// window_o[0][0] = img_out[j*IMG_WIDTH+0]; window_o[0][1] = img_out[(j+1)*IMG_WIDTH+0] ; window_o[0][2] = img_out[(j+2)*IMG_WIDTH+0];
-		// window_o[1][0] = img_out[j*IMG_WIDTH+1]; window_o[1][1] = img_out[(j+1)*IMG_WIDTH+1] ; window_o[1][2] = img_out[(j+2)*IMG_WIDTH+1];
-		// window_o[2][0] = img_out[j*IMG_WIDTH+2]; window_o[2][1] = img_out[(j+1)*IMG_WIDTH+2] ; window_o[2][2] = img_out[(j+2)*IMG_WIDTH+2];
+		for(col=1; col < width-1; col++)
+		{	
+            //Optimized way with no multiplication and replacing A+A == A<<1
+            sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
+                //(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
+                (-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
+                (-window_i[2][0]) + 0 + (window_i[2][2]);
 
-		idx = (j+2)*IMG_WIDTH;
-		for (int i = 0; i<IMG_WIDTH-2; i++)
-		{
-			int pixval_x =
-				(sobel_x[0][0] * window_i[0][0]) + (sobel_x[0][1] * window_i[0][1]) + (sobel_x[0][2] * window_i[0][2]) +
-				(sobel_x[1][0] * window_i[1][0]) + (sobel_x[1][1] * window_i[1][1]) + (sobel_x[1][2] * window_i[1][2]) +
-				(sobel_x[2][0] * window_i[2][0]) + (sobel_x[2][1] * window_i[2][1]) + (sobel_x[2][2] * window_i[2][2]);
+            //sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
+            sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
+                0 + 0 + 0 +
+                //(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
+                (window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
 
-			int pixval_y =
-				(sobel_y[0][0] * window_i[0][0]) + (sobel_y[0][1] * window_i[0][1]) + (sobel_y[0][2] * window_i[0][2]) +
-				(sobel_y[1][0] * window_i[1][0]) + (sobel_y[1][1] * window_i[1][1]) + (sobel_y[1][2] * window_i[1][2]) +
-				(sobel_y[2][0] * window_i[2][0]) + (sobel_y[2][1] * window_i[2][1]) + (sobel_y[2][2] * window_i[2][2]);
+            //Non-optimized method equivalent to the filter:
+			/*
+				const int sobel_x[3][3] = {
+						{-1,0,1},
+						{-2,0,2},
+						{-1,0,1}
+					};
+				const int sobel_y[3][3] = {
+						{-1,-2,-1},
+						{0,0,0},
+						{1,2,1}
+				};			
+            sum1 = (-1 * img_in[row-1][col-1]) + 
+            (1 * img_in[row-1][col+1]) +
+            (-2 * img_in[row][col-1]) + 
+            (2 * img_in[row][col+1]) + 
+            (-1 * img_in[row+1][col-1]) + 
+            (1 * img_in[row+1][col+1]);
 
-			// uint32_t pixval_x =
-			// 	(sobel_x[0][0] * img_in[j*IMG_WIDTH+0]) + (sobel_x[0][1] * img_in[(j+1)*IMG_WIDTH+0]) + (sobel_x[0][2] * img_in[(j+2)*IMG_WIDTH+0]) +
-			// 	(sobel_x[1][0] * img_in[j*IMG_WIDTH+1]) + (sobel_x[1][1] * img_in[(j+1)*IMG_WIDTH+1]) + (sobel_x[1][2] * img_in[(j+2)*IMG_WIDTH+1]) +
-			// 	(sobel_x[2][0] * img_in[j*IMG_WIDTH+2]) + (sobel_x[2][1] * img_in[(j+1)*IMG_WIDTH+2]) + (sobel_x[2][2] * img_in[(j+2)*IMG_WIDTH+2]);
+            sum2 = (-1 * img_in[row-1][col-1]) + 
+            (-2 * img_in[row-1][col]) +
+            (-1 * img_in[row-1][col+1]) + 
+            (1 * img_in[row+1][col-1]) + 
+            (2 * img_in[row+1][col]) +
+            (1 * img_in[row+1][col+1]);
+            */
 
-			// uint32_t pixval_y =
-			// 	(sobel_y[0][0] * img_in[j*IMG_WIDTH+0]) + (sobel_y[0][1] * img_in[(j+1)*IMG_WIDTH+0]) + (sobel_y[0][2] * img_in[(j+2)*IMG_WIDTH+0]) +
-			// 	(sobel_y[1][0] * img_in[j*IMG_WIDTH+1]) + (sobel_y[1][1] * img_in[(j+1)*IMG_WIDTH+1]) + (sobel_y[1][2] * img_in[(j+2)*IMG_WIDTH+1]) +
-			// 	(sobel_y[2][0] * img_in[j*IMG_WIDTH+2]) + (sobel_y[2][1] * img_in[(j+1)*IMG_WIDTH+2]) + (sobel_y[2][2] * img_in[(j+2)*IMG_WIDTH+2]);
-
-
-			if(pixval_x < 0)
-			{
-				pixval_x = -pixval_x;
-			}
-			if(pixval_y < 0)
-			{
-				pixval_y = -pixval_y;
-			}
-			img_out[j*IMG_WIDTH+i] = pixval_x + pixval_y ;
-
-			//int sum = ABS(pixval_x) + ABS(pixval_y);
-//			int sum = ABS(pixval_x + pixval_y);
-//			if (sum > 255)
-//			{
-//				sum = 255; //for best performance
-//			}
-//			img_out[j*IMG_WIDTH+i] = (uint8_t)sum;
-
-			// rolling the windows maximizing internal memory reuse and minimizing the input bandwidth
-			//idx += i;
-			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[idx+i];
-			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[idx+i+1];
-			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[idx+i+2];
-
-			// window_o[0][0] = window_o[0][1]; window_o[0][1] = window_o[0][2]; window_o[0][2] = img_out[idx];
-			// window_o[1][0] = window_o[1][1]; window_o[1][1] = window_o[1][2]; window_o[1][2] = img_out[idx+1];
-			// window_o[2][0] = window_o[2][1]; window_o[2][1] = window_o[2][2]; window_o[2][2] = img_out[idx+2];
+            if(sum1 < 0)
+            {
+            	sum1 = -sum1;
+            }
+            if(sum2 < 0)
+            {
+            	sum2 = -sum2;
+            }
+            img_out[row][col] = sum1 + sum2;
+            if(sum1 + sum2 > curMax)
+            {
+            	curMax = sum1 + sum2;
+            }	
+            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
+            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
+            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
 		}
-     }
+	}
 }
 
 void sobel_64b(data_t *img_in, data_t *img_out){
-	uint8_t src_img[IMG_HEIGHT*IMG_WIDTH];
-	uint8_t dest_img[IMG_HEIGHT*IMG_WIDTH];
+	uint8_t src_img[IMG_HEIGHT][IMG_WIDTH];
+	uint8_t dest_img[IMG_HEIGHT][IMG_WIDTH];
 
 	uint32_t itr = 0;
 	data_t pix;
@@ -189,7 +197,7 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 			// avoid floating point math, but produces an image a bit darker
             // original conversion
 			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
-			src_img[itr] = (uint8_t)(red>>2) + (uint8_t)(green>>1) + (uint8_t)(blue>>2);
+			src_img[i][j] = (uint8_t)(red>>2) + (uint8_t)(green>>1) + (uint8_t)(blue>>2);
 
 			// alternative solution
 			// pix = img_in[itr];
@@ -198,7 +206,7 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 
 			// jump by the 5 unused bytes of data_t
 			img_ptr +=5;
-			itr++;
+			//itr++;
 		}
 	}
 	//save_img("gray.gray",src_img);
@@ -210,7 +218,7 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 	{
 		for (int j = 0; j<IMG_WIDTH; j++)
 		{
-			pix = (data_t)dest_img[itr];
+			pix = (data_t)dest_img[i][j];
 			img_out[itr] = pix;
 			itr++;
 		}

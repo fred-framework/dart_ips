@@ -246,13 +246,107 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 */
 
 
+// reference function
+void sobel_hw(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IMG_WIDTH]){
+	uint8_t window_i[3][3];
+	uint32_t row,col,curMax;
+	int sum1,sum2;
+
+	const int height = IMG_HEIGHT;
+	const int width = IMG_WIDTH;
+
+    // set the edges to black
+	edges:{
+		//#pragma HLS PIPELINE rewind
+		for(row=1; row < height-1; row++)
+		{
+			img_out[row][0] = 0;
+			img_out[row][width-1] = 0;
+		}
+		for(col=0; col < width; col++)
+		{
+			img_out[0][col] = 0;
+			img_out[height-1][col] = 0;
+		}
+	}
+
+	// apply the filter using a rolling window
+	for(row=1; row < height-1; row++)
+	{
+		// loading the initial values of the rolling windows
+		window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
+		window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
+		window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
+
+		for(col=1; col < width-1; col++)
+		{	
+			#pragma HLS PIPELINE
+            //Optimized way with no multiplication and replacing A+A == A<<1
+            sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
+                //(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
+                (-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
+                (-window_i[2][0]) + 0 + (window_i[2][2]);
+
+            //sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
+            sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
+                0 + 0 + 0 +
+                //(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
+                (window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
+
+            //Non-optimized method equivalent to the filter:
+			/*
+				const int sobel_x[3][3] = {
+						{-1,0,1},
+						{-2,0,2},
+						{-1,0,1}
+					};
+				const int sobel_y[3][3] = {
+						{-1,-2,-1},
+						{0,0,0},
+						{1,2,1}
+				};			
+            sum1 = (-1 * img_in[row-1][col-1]) + 
+            (1 * img_in[row-1][col+1]) +
+            (-2 * img_in[row][col-1]) + 
+            (2 * img_in[row][col+1]) + 
+            (-1 * img_in[row+1][col-1]) + 
+            (1 * img_in[row+1][col+1]);
+
+            sum2 = (-1 * img_in[row-1][col-1]) + 
+            (-2 * img_in[row-1][col]) +
+            (-1 * img_in[row-1][col+1]) + 
+            (1 * img_in[row+1][col-1]) + 
+            (2 * img_in[row+1][col]) +
+            (1 * img_in[row+1][col+1]);
+            */
+
+            if(sum1 < 0)
+            {
+            	sum1 = -sum1;
+            }
+            if(sum2 < 0)
+            {
+            	sum2 = -sum2;
+            }
+            img_out[row][col] = sum1 + sum2;
+            if(sum1 + sum2 > curMax)
+            {
+            	curMax = sum1 + sum2;
+            }	
+            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
+            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
+            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////
 // NO FUNCTION CALLS w WINDOWS
 //////////////////////////////////////////////////////////////////
 void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out, args_t args0, args_t args1)
 {
-	uint8_t src_img[IMG_HEIGHT*IMG_WIDTH];
-	uint8_t dest_img[IMG_HEIGHT*IMG_WIDTH];
+	uint8_t src_img[IMG_HEIGHT][IMG_WIDTH];
+	uint8_t dest_img[IMG_HEIGHT][IMG_WIDTH];
 
 	// make sure that the consecutive addresses are in different memories to improve the pipeline
 //	#pragma HLS ARRAY_RESHAPE variable=src_img cyclic factor=4
@@ -262,13 +356,27 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 	data_t * mem_out = (data_t *)mem_port_out + (args1 / sizeof(data_t));
 
 	uint32_t itr = 0,idx;
-	data_t pix;
+	//data_t pix;
+	uint8_t red,green,blue;
+	// access the input data byte by byte instead of dta_t
+	uint8_t *img_ptr = (uint8_t *)mem_in;
 	data_in1:for (int i = 0; i<IMG_HEIGHT; i++)
 	{
-		uint8_t gray_pix;
+		//uint8_t gray_pix;
 		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
-			#pragma HLS PIPELINE rewind
+			#pragma HLS PIPELINE
+            red = (uint8_t)*(img_ptr++);
+            green = (uint8_t)*(img_ptr++);
+            blue =(uint8_t)*(img_ptr++);
+			// avoid floating point math, but produces an image a bit darker
+            // original conversion
+			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
+			src_img[i][j] = (uint8_t)(red>>2) + (uint8_t)(green>>1) + (uint8_t)(blue>>2);
+
+			// jump by the 5 unused bytes of data_t
+			img_ptr +=5;
+/*
 			pix = mem_in[itr];
 			// avoid floating point match, but produces an image a bit darker
 			gray_pix = U32_B0(pix)>>2 + U32_B1(pix)>>1 + U32_B2(pix)>>2;
@@ -276,6 +384,7 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 			// copy the input gray image
 			dest_img[itr] = gray_pix;
 			itr++;
+			*/
 		}
 	}
 //#pragma HLS stream variable=mat_image_in //depth=8
@@ -285,7 +394,7 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 
 //#pragma HLS dataflow
 
-
+/*
 	// Apply the filter stack
 	const int sobel_x[3][3] = {
 			{-1,0,1},
@@ -297,13 +406,14 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 			{0,0,0},
 			{1,2,1}
 	};
+	
 	uint8_t window_i[3][3];
-	uint8_t window_o[3][3];
+	//uint8_t window_o[3][3];
 
 	#pragma HLS ARRAY_PARTITION variable=window_i complete
-	#pragma HLS ARRAY_PARTITION variable=window_o complete
-	#pragma HLS ARRAY_PARTITION variable=sobel_x complete
-	#pragma HLS ARRAY_PARTITION variable=sobel_y complete
+	//#pragma HLS ARRAY_PARTITION variable=window_o complete
+	//#pragma HLS ARRAY_PARTITION variable=sobel_x complete
+	//#pragma HLS ARRAY_PARTITION variable=sobel_y complete
 
 	sobel1:for (int j = 0; j<IMG_HEIGHT-2; j++)
 	{
@@ -350,6 +460,8 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 			window_o[2][0] = window_o[2][1]; window_o[2][1] = window_o[2][2]; window_o[2][2] = dest_img[idx+2];
 		}
      }
+*/
+	sobel_hw(src_img,dest_img);
 
 
 	// Write image back main memory
@@ -359,8 +471,7 @@ void hw_mod(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *
 		data_out2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
 			#pragma HLS PIPELINE
-			pix = (data_t)dest_img[itr];
-			mem_out[itr] = pix;
+			mem_out[itr] = (data_t)dest_img[i][j];
 			itr++;
 		}
 	}
