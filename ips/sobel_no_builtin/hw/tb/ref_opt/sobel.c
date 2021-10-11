@@ -128,60 +128,59 @@ int sobelFilter(unsigned char inImg[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg
     }
 	//Loop through the whole image pixel by pixel
 	unsigned char window_i[3][3];
-	for(row=1; row < height-1; row++)
+	for(row=0; row < height-2; row++)
 	{
-		// loading the initial values of the rolling windows
-		window_i[0][0] = inImg[row-1][0]; window_i[0][1] = inImg[row-1][1] ; window_i[0][2] = inImg[row-1][2];
-		window_i[1][0] = inImg[row+0][0]; window_i[1][1] = inImg[row+0][1] ; window_i[1][2] = inImg[row+0][2];
-		window_i[2][0] = inImg[row+1][0]; window_i[2][1] = inImg[row+1][1] ; window_i[2][2] = inImg[row+1][2];
-
-		for(col=1; col < width-1; col++)
+		for(col=0; col < width; col++)
 		{	
-            //Optimized way with no multiplication and replacing A+A == A<<1
-            sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
-                //(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
-                (-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
-                (-window_i[2][0]) + 0 + (window_i[2][2]);
+			// loading the initial values of the rolling windows
+			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = inImg[row+0][col];
+			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = inImg[row+1][col];
+			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = inImg[row+2][col];
+			if (col >= 2){
+				//Optimized way with no multiplication and replacing A+A == A<<1
+				sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
+					//(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
+					(-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
+					(-window_i[2][0]) + 0 + (window_i[2][2]);
 
-            //sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
-            sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
-                0 + 0 + 0 +
-                //(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
-                (window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
+				//sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
+				sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
+					0 + 0 + 0 +
+					//(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
+					(window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
 
-            //Non-optimized method
-            /*
-            sum1 = (-1 * inImg[row-1][col-1]) + 
-            (1 * inImg[row-1][col+1]) +
-            (-2 * inImg[row][col-1]) + 
-            (2 * inImg[row][col+1]) + 
-            (-1 * inImg[row+1][col-1]) + 
-            (1 * inImg[row+1][col+1]);
+				//Non-optimized method
+				/*
+				sum1 = (-1 * inImg[row-1][col-1]) + 
+				(1 * inImg[row-1][col+1]) +
+				(-2 * inImg[row][col-1]) + 
+				(2 * inImg[row][col+1]) + 
+				(-1 * inImg[row+1][col-1]) + 
+				(1 * inImg[row+1][col+1]);
 
-            sum2 = (-1 * inImg[row-1][col-1]) + 
-            (-2 * inImg[row-1][col]) +
-            (-1 * inImg[row-1][col+1]) + 
-            (1 * inImg[row+1][col-1]) + 
-            (2 * inImg[row+1][col]) +
-            (1 * inImg[row+1][col+1]);
-            */
+				sum2 = (-1 * inImg[row-1][col-1]) + 
+				(-2 * inImg[row-1][col]) +
+				(-1 * inImg[row-1][col+1]) + 
+				(1 * inImg[row+1][col-1]) + 
+				(2 * inImg[row+1][col]) +
+				(1 * inImg[row+1][col+1]);
+				*/
 
-            if(sum1 < 0)
-            {
-            sum1 = -sum1;
-            }
-            if(sum2 < 0)
-            {
-            sum2 = -sum2;
-            }
-            outImg[row][col] = sum1 + sum2;
-            if(sum1 + sum2 > curMax)
-            {
-            curMax = sum1 + sum2;
-            }	
-            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = inImg[row-1][col];
-            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = inImg[row+0][col];
-            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = inImg[row+1][col];
+				if(sum1 < 0)
+				{
+				sum1 = -sum1;
+				}
+				if(sum2 < 0)
+				{
+				sum2 = -sum2;
+				}
+				outImg[row*1][col-1] = sum1 + sum2;
+				if(sum1 + sum2 > curMax)
+				{
+				curMax = sum1 + sum2;
+				}	
+			}
+
 		}
 	}
 	

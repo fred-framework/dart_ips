@@ -90,7 +90,7 @@ void save_img(const char *filename, const uint8_t *image){
 // reference function
 void sobel(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IMG_WIDTH]){
 	uint8_t window_i[3][3];
-	uint32_t row,col,curMax;
+	uint32_t row,col,curMax=0;
 	int sum1,sum2;
 
 	const int height = IMG_HEIGHT;
@@ -111,26 +111,39 @@ void sobel(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IM
 	// apply the filter using a rolling window
 	for(row=1; row < height-1; row++)
 	{
-		// loading the initial values of the rolling windows
-		window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
-		window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
-		window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
+
+//      // loading the initial values of the rolling windows
+//		window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
+//		window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
+//		window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
+
 
 		for(col=1; col < width-1; col++)
 		{	
-            //Optimized way with no multiplication and replacing A+A == A<<1
-            sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
-                //(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
-                (-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
-                (-window_i[2][0]) + 0 + (window_i[2][2]);
+			if (row >= 1 && col ==1){
+				// loading the initial values of the rolling windows
+				window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
+				window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
+				window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
 
-            //sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
-            sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
-                0 + 0 + 0 +
-                //(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
-                (window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
+			}else{
+				window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
+				window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
+				window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
+			}
+			//Optimized way with no multiplication and replacing A+A == A<<1
+			sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
+				//(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
+				(-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
+				(-window_i[2][0]) + 0 + (window_i[2][2]);
 
-            //Non-optimized method equivalent to the filter:
+			//sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
+			sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
+				0 + 0 + 0 +
+				//(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
+				(window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
+
+			//Non-optimized method equivalent to the filter:
 			/*
 				const int sobel_x[3][3] = {
 						{-1,0,1},
@@ -142,37 +155,37 @@ void sobel(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IM
 						{0,0,0},
 						{1,2,1}
 				};			
-            sum1 = (-1 * img_in[row-1][col-1]) + 
-            (1 * img_in[row-1][col+1]) +
-            (-2 * img_in[row][col-1]) + 
-            (2 * img_in[row][col+1]) + 
-            (-1 * img_in[row+1][col-1]) + 
-            (1 * img_in[row+1][col+1]);
+			sum1 = (-1 * img_in[row-1][col-1]) + 
+			(1 * img_in[row-1][col+1]) +
+			(-2 * img_in[row][col-1]) + 
+			(2 * img_in[row][col+1]) + 
+			(-1 * img_in[row+1][col-1]) + 
+			(1 * img_in[row+1][col+1]);
 
-            sum2 = (-1 * img_in[row-1][col-1]) + 
-            (-2 * img_in[row-1][col]) +
-            (-1 * img_in[row-1][col+1]) + 
-            (1 * img_in[row+1][col-1]) + 
-            (2 * img_in[row+1][col]) +
-            (1 * img_in[row+1][col+1]);
-            */
+			sum2 = (-1 * img_in[row-1][col-1]) + 
+			(-2 * img_in[row-1][col]) +
+			(-1 * img_in[row-1][col+1]) + 
+			(1 * img_in[row+1][col-1]) + 
+			(2 * img_in[row+1][col]) +
+			(1 * img_in[row+1][col+1]);
+			*/
 
-            if(sum1 < 0)
-            {
-            	sum1 = -sum1;
-            }
-            if(sum2 < 0)
-            {
-            	sum2 = -sum2;
-            }
-            img_out[row][col] = sum1 + sum2;
-            if(sum1 + sum2 > curMax)
-            {
-            	curMax = sum1 + sum2;
-            }	
-            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
-            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
-            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
+			if(sum1 < 0)
+			{
+			sum1 = -sum1;
+			}
+			if(sum2 < 0)
+			{
+			sum2 = -sum2;
+			}
+			img_out[row][col] = sum1 + sum2;
+			if(sum1 + sum2 > curMax)
+			{
+			curMax = sum1 + sum2;
+			}	
+//            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
+//            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
+//            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
 		}
 	}
 }
@@ -339,9 +352,9 @@ int main()
 	}
 	// print only the 5 initial lines of the images
 	std::cout << "Expected value: ";
-	print_img((uint8_t*)expected_out_8UC1, IMG_WIDTH,5,1);
+	//print_img((uint8_t*)expected_out_8UC1, IMG_WIDTH,5,1);
 	std::cout << "Output value  : ";
-	print_img((uint8_t*)mem_out_8UC1, IMG_WIDTH,5,1);
+	//print_img((uint8_t*)mem_out_8UC1, IMG_WIDTH,5,1);
 
 #ifdef WITH_SAVE_OUTPUT
 	save_img("output.gray",mem_out_8UC1);
