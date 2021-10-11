@@ -70,10 +70,14 @@ sudo apt install imagemagick
 
 ## Authors
 
-- Marco Pagani, HLS IP design
-- Alexandre Amory, tb and sw design and testing.
+- Alexandre Amory, IP design, tb and sw design and testing.
 
 ## TO DO
+
+UG1270 - Vivado HLS OptimizationMethodology Guide
+See chapters 4 and 5 for improved convolution data access pattern 
+https://www.xilinx.com/content/dam/xilinx/support/documentation/sw_manuals/xilinx2018_1/ug1270-vivado-hls-opt-methodology-guide.pdf
+
 
 how to model image filters
 https://github.com/Xilinx/HLx_Examples/tree/master/Vision/video_edge

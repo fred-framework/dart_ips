@@ -14,7 +14,18 @@
 static const unsigned int IMG_WIDTH = 512;
 static const unsigned int IMG_HEIGHT = 512;
 
-int sobelFilter(unsigned char inImg[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH]);
+//#define PERFORMANCE
+// When this parameter is defined, the input memory is duplicated, removing internal depedencies in the main pipeline,
+// leading the to the most optimized performance assuming the PREM approach
+
+#ifdef PERFORMANCE
+void sobelFilter(const unsigned char inImg1[IMG_HEIGHT][IMG_WIDTH],const unsigned char inImg2[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH]);
+void to_gray(const unsigned char *mem_in,unsigned char src_img1[IMG_HEIGHT][IMG_WIDTH],unsigned char src_img2[IMG_HEIGHT][IMG_WIDTH]);
+#else
+void sobelFilter(const unsigned char inImg1[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH]);
+void to_gray(const unsigned char *mem_in,unsigned char src_img1[IMG_HEIGHT][IMG_WIDTH]);
+#endif
+
 void save_img(const char *filename, const unsigned char image[IMG_HEIGHT][IMG_WIDTH]);
 
 int main(int argc, char* argv[])
@@ -26,7 +37,12 @@ int main(int argc, char* argv[])
 		exit(1);             
 	}
    	unsigned char img_buffer [IMG_WIDTH*IMG_HEIGHT*3];
-    unsigned char in_gray_buffer [IMG_WIDTH][IMG_HEIGHT];
+#ifdef PERFORMANCE
+    unsigned char in_gray_buffer1 [IMG_WIDTH][IMG_HEIGHT];
+	unsigned char in_gray_buffer2 [IMG_WIDTH][IMG_HEIGHT];
+#else
+	unsigned char in_gray_buffer1 [IMG_WIDTH][IMG_HEIGHT];
+#endif
     unsigned char out_gray_buffer [IMG_WIDTH][IMG_HEIGHT];
 
     // read the raw rgb image, wo any image format
@@ -39,38 +55,19 @@ int main(int argc, char* argv[])
 	fclose(fptr);
     
     // to gray
-    unsigned int idx=0,row,col;
-    int red,green,blue;
-    unsigned char *img_ptr = img_buffer;
-	for(row=0; row < IMG_HEIGHT; row++)
-	{
-		for(col=0; col < IMG_WIDTH; col++)
-		{
-            //convert to grayscale as values are read in.
-            //red = fgetc(inpFile);
-            //green = fgetc(inpFile);
-            //blue = fgetc(inpFile);
-            //gray_buffer[row][col] = toGrayscale(red, green, blue);
-            // 1st read the value and then increment the pointer
-            //red = (int)*(img_ptr++);
-            //green = (int)*(img_ptr++);
-            //blue =(int)*(img_ptr++);
-            red = (unsigned char)*(img_ptr++);
-            green = (unsigned char)*(img_ptr++);
-            blue =(unsigned char)*(img_ptr++);
-            // original convertion
-			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
-			// result in darker image
-			in_gray_buffer[row][col] = (unsigned char)(red>>2) + (unsigned char)(green>>1) + (unsigned char)(blue>>2);
-			// same as the previous one
-			//in_gray_buffer[row][col] = (int)(red>>2) + (int)(green>>1) + (int)(blue>>2);
-		}
-	}
-	save_img("gray.gray",in_gray_buffer);
+#ifdef PERFORMANCE
+	to_gray(img_buffer,in_gray_buffer1,in_gray_buffer2);
+#else
+	to_gray(img_buffer,in_gray_buffer1);
+#endif
+	save_img("gray.gray",in_gray_buffer1);
 	
-	sobelFilter(in_gray_buffer, out_gray_buffer);
-	
-	// save the output
+	// sobel
+#ifdef PERFORMANCE
+	sobelFilter(in_gray_buffer1,in_gray_buffer2, out_gray_buffer);
+#else
+	sobelFilter(in_gray_buffer1, out_gray_buffer);
+#endif
 	save_img("output.gray",out_gray_buffer);
     
 	//TODO: free memory
@@ -101,8 +98,53 @@ void save_img(const char *filename, const unsigned char image[IMG_HEIGHT][IMG_WI
 	system(command);
 }
 
+
+#ifdef PERFORMANCE
+void to_gray(const unsigned char *mem_in,unsigned char src_img1[IMG_HEIGHT][IMG_WIDTH],unsigned char src_img2[IMG_HEIGHT][IMG_WIDTH])
+#else
+void to_gray(const unsigned char *mem_in,unsigned char src_img1[IMG_HEIGHT][IMG_WIDTH])
+#endif
+{
+	unsigned char red,green,blue,pix8;
+	// access the input data byte by byte instead of dta_t
+	//data_t pix;
+	//uint32_t idx=0;
+
+	unsigned char *img_ptr = (unsigned char *)mem_in;
+	data_in1:for (int i = 0; i<IMG_HEIGHT; i++)
+	{
+		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
+		{
+			#pragma HLS PIPELINE
+			red = (unsigned char)*(img_ptr++);
+			green = (unsigned char)*(img_ptr++);
+			blue =(unsigned char)*(img_ptr++);
+			//pix = mem_in[idx];
+			//red = U32_B0(pix);
+			//green = U32_B1(pix);
+			//blue = U32_B2(pix);
+			// avoid floating point math, but produces an image a bit darker
+			// original conversion
+			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
+			pix8 = (unsigned char)(red>>2) + (unsigned char)(green>>1) + (unsigned char)(blue>>2);
+			src_img1[i][j] = pix8;
+			#ifdef PERFORMANCE
+				src_img2[i][j] = pix8;
+			#endif
+			// jump by the 5 unused bytes of data_t
+			//img_ptr +=5;
+			//idx++;
+		}
+	}
+
+}
+
 //Only supports black/white images
-int sobelFilter(unsigned char inImg[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH])
+#ifdef PERFORMANCE
+void sobelFilter(const unsigned char inImg1[IMG_HEIGHT][IMG_WIDTH], const unsigned char inImg2[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH])
+#else
+void sobelFilter(const unsigned char inImg1[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg[IMG_HEIGHT][IMG_WIDTH])
+#endif
 {
 	int row;
 	int col;
@@ -133,9 +175,15 @@ int sobelFilter(unsigned char inImg[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg
 		for(col=0; col < width; col++)
 		{	
 			// loading the initial values of the rolling windows
-			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = inImg[row+0][col];
-			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = inImg[row+1][col];
-			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = inImg[row+2][col];
+			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = inImg1[row+0][col];
+			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = inImg1[row+1][col];
+			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2];
+			#ifdef PERFORMANCE
+			window_i[2][2] = inImg2[row+2][col];
+			#else
+			window_i[2][2] = inImg1[row+2][col];
+			#endif
+
 			if (col >= 2){
 				//Optimized way with no multiplication and replacing A+A == A<<1
 				sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
@@ -174,7 +222,7 @@ int sobelFilter(unsigned char inImg[IMG_HEIGHT][IMG_WIDTH], unsigned char outImg
 				{
 				sum2 = -sum2;
 				}
-				outImg[row*1][col-1] = sum1 + sum2;
+				outImg[row+1][col-1] = sum1 + sum2;
 				if(sum1 + sum2 > curMax)
 				{
 				curMax = sum1 + sum2;

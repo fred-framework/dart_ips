@@ -84,6 +84,9 @@ void save_img(const char *filename, const uint8_t *image){
 	fclose(fout);
 	// convert -size 512x512 -depth 8 ./sobel/lat-in/csim/build/ref_output.gray img_out.png
 	//system("/usr/bin/convert -size 512x512 -depth 8 ./output.gray ./output.png");
+	char command[100];
+	sprintf(command, "/usr/bin/convert -size 512x512 -depth 8 ./%s ./%s.png", filename, filename);
+	system(command);
 }
 
 
@@ -109,83 +112,67 @@ void sobel(uint8_t img_in[IMG_HEIGHT][IMG_WIDTH], uint8_t img_out[IMG_HEIGHT][IM
     }
 
 	// apply the filter using a rolling window
-	for(row=1; row < height-1; row++)
+	for(row=0; row < height-2; row++)
 	{
-
-//      // loading the initial values of the rolling windows
-//		window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
-//		window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
-//		window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
-
-
-		for(col=1; col < width-1; col++)
+		for(col=0; col < width; col++)
 		{	
-			if (row >= 1 && col ==1){
-				// loading the initial values of the rolling windows
-				window_i[0][0] = img_in[row-1][0]; window_i[0][1] = img_in[row-1][1] ; window_i[0][2] = img_in[row-1][2];
-				window_i[1][0] = img_in[row+0][0]; window_i[1][1] = img_in[row+0][1] ; window_i[1][2] = img_in[row+0][2];
-				window_i[2][0] = img_in[row+1][0]; window_i[2][1] = img_in[row+1][1] ; window_i[2][2] = img_in[row+1][2];
+			window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row+0][col];
+			window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+1][col];
+			window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+2][col];
+			if (col >= 2){
+				//Optimized way with no multiplication and replacing A+A == A<<1
+				sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
+					//(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
+					(-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
+					(-window_i[2][0]) + 0 + (window_i[2][2]);
 
-			}else{
-				window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
-				window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
-				window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
+				//sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
+				sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
+					0 + 0 + 0 +
+					//(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
+					(window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
+
+				//Non-optimized method equivalent to the filter:
+				/*
+					const int sobel_x[3][3] = {
+							{-1,0,1},
+							{-2,0,2},
+							{-1,0,1}
+						};
+					const int sobel_y[3][3] = {
+							{-1,-2,-1},
+							{0,0,0},
+							{1,2,1}
+					};			
+				sum1 = (-1 * img_in[row-1][col-1]) + 
+				(1 * img_in[row-1][col+1]) +
+				(-2 * img_in[row][col-1]) + 
+				(2 * img_in[row][col+1]) + 
+				(-1 * img_in[row+1][col-1]) + 
+				(1 * img_in[row+1][col+1]);
+
+				sum2 = (-1 * img_in[row-1][col-1]) + 
+				(-2 * img_in[row-1][col]) +
+				(-1 * img_in[row-1][col+1]) + 
+				(1 * img_in[row+1][col-1]) + 
+				(2 * img_in[row+1][col]) +
+				(1 * img_in[row+1][col+1]);
+				*/
+
+				if(sum1 < 0)
+				{
+					sum1 = -sum1;
+				}
+				if(sum2 < 0)
+				{
+					sum2 = -sum2;
+				}
+				img_out[row+1][col-1] = sum1 + sum2;
+				if(sum1 + sum2 > curMax)
+				{
+					curMax = sum1 + sum2;
+				}
 			}
-			//Optimized way with no multiplication and replacing A+A == A<<1
-			sum1 = (-window_i[0][0]) + 0 + (window_i[0][2]) +
-				//(-window_i[1][0] - window_i[1][0]) + 0 + (window_i[1][2] + window_i[1][2]) + 
-				(-(window_i[1][0] << 1)) + 0 + (window_i[1][2] << 1) + 
-				(-window_i[2][0]) + 0 + (window_i[2][2]);
-
-			//sum2 = (-window_i[0][0]) + (-window_i[0][1] - window_i[0][1]) + (-window_i[0][2]) + 
-			sum2 = (-window_i[0][0]) + (-(window_i[0][1] << 1)) + (-window_i[0][2]) + 
-				0 + 0 + 0 +
-				//(window_i[2][0]) + (window_i[2][1] + window_i[2][1]) + (window_i[2][2]);
-				(window_i[2][0]) + (window_i[2][1] << 1) + (window_i[2][2]);
-
-			//Non-optimized method equivalent to the filter:
-			/*
-				const int sobel_x[3][3] = {
-						{-1,0,1},
-						{-2,0,2},
-						{-1,0,1}
-					};
-				const int sobel_y[3][3] = {
-						{-1,-2,-1},
-						{0,0,0},
-						{1,2,1}
-				};			
-			sum1 = (-1 * img_in[row-1][col-1]) + 
-			(1 * img_in[row-1][col+1]) +
-			(-2 * img_in[row][col-1]) + 
-			(2 * img_in[row][col+1]) + 
-			(-1 * img_in[row+1][col-1]) + 
-			(1 * img_in[row+1][col+1]);
-
-			sum2 = (-1 * img_in[row-1][col-1]) + 
-			(-2 * img_in[row-1][col]) +
-			(-1 * img_in[row-1][col+1]) + 
-			(1 * img_in[row+1][col-1]) + 
-			(2 * img_in[row+1][col]) +
-			(1 * img_in[row+1][col+1]);
-			*/
-
-			if(sum1 < 0)
-			{
-			sum1 = -sum1;
-			}
-			if(sum2 < 0)
-			{
-			sum2 = -sum2;
-			}
-			img_out[row][col] = sum1 + sum2;
-			if(sum1 + sum2 > curMax)
-			{
-			curMax = sum1 + sum2;
-			}	
-//            window_i[0][0] = window_i[0][1]; window_i[0][1] = window_i[0][2]; window_i[0][2] = img_in[row-1][col];
-//            window_i[1][0] = window_i[1][1]; window_i[1][1] = window_i[1][2]; window_i[1][2] = img_in[row+0][col];
-//            window_i[2][0] = window_i[2][1]; window_i[2][1] = window_i[2][2]; window_i[2][2] = img_in[row+1][col];
 		}
 	}
 }
@@ -204,9 +191,9 @@ void sobel_64b(data_t *img_in, data_t *img_out){
 		data_in2:for (int j = 0; j<IMG_WIDTH; j++)
 		{
 			#pragma HLS PIPELINE rewind
-            red = (unsigned char)*(img_ptr++);
-            green = (unsigned char)*(img_ptr++);
-            blue =(unsigned char)*(img_ptr++);
+            red = (uint8_t)*(img_ptr++);
+            green = (uint8_t)*(img_ptr++);
+            blue =(uint8_t)*(img_ptr++);
 			// avoid floating point math, but produces an image a bit darker
             // original conversion
 			//in_gray_buffer[row][col] = (0.3*red) + (0.59*green) + (0.11*blue);
@@ -295,9 +282,6 @@ int main()
 	img_buf_ptr = (uint8_t*)img_buffer;
 #endif
 
-	//printf("INPUT IMG (uint8_t)\n");
-	//print_img(img_buf_ptr, IMG_WIDTH,5,1);
-
 	// Set hw accelerator args
 	// The base address is the memory array start address
 	args[0] = (args_t)0;
@@ -309,7 +293,7 @@ int main()
 	for (i = 0; i < IMG_HEIGHT; i++){
 		for (j = 0; j < IMG_WIDTH; j++)	{
 			// 24bits r, g, b is transformed into data_t/64bits 0, r, g, b
-			// very unoptimised encoding
+			// very unoptimized encoding
 			pixel32 = U32_PACK(0,img_buf_ptr[aux+2],img_buf_ptr[aux+1],img_buf_ptr[aux]);
 			mem_in[idx] = (data_t)pixel32;
 			//if (i==0)
@@ -319,16 +303,12 @@ int main()
 		}
 		
 	}
-	//printf("INPUT IMG (data_t)\n");
-	//print_img((void*)mem_in,IMG_WIDTH,5,0);
 
 	// run the sw reference
 	sobel_64b(mem_in, expected_out);
-	//printf("REF END\n");
 
 	// run FRED
 	sobel_top(&id_out, args, mem_in, mem_out);
-	//printf("FRED END\n");
 
 	// copying the hw buffer with data_t format into the 8UC1 bmp data format
 	idx = 0;
@@ -351,9 +331,9 @@ int main()
 		std::cout << "Match!\n";
 	}
 	// print only the 5 initial lines of the images
-	std::cout << "Expected value: ";
+	//std::cout << "Expected value: ";
 	//print_img((uint8_t*)expected_out_8UC1, IMG_WIDTH,5,1);
-	std::cout << "Output value  : ";
+	//std::cout << "Output value  : ";
 	//print_img((uint8_t*)mem_out_8UC1, IMG_WIDTH,5,1);
 
 #ifdef WITH_SAVE_OUTPUT
