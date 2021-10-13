@@ -7,16 +7,31 @@
 
 #include "fir.hpp"
 
+#define PERFORMANCE
+
 void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 {
+    int j, i;
     data_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
+    //Shift registers
+    int shift_reg[FIR_WINDOW_SIZE];
+#ifdef PERFORMANCE
+    #pragma HLS ARRAY_PARTITION variable = shift_reg dim = 1 complete
+#endif
+	// it seems that this loop could be avoided by using the reset pragma. TODO: confirm it 
+	#pragma HLS reset variable=shift_reg
+    /*
+    reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+		#pragma HLS pipeline
+        shift_reg[j] = 0;
+    }
+    */
 
     //fetch data
-fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
-                in_buff[i] = mem_port_in[i];        
-            }
-
-    int j, i;
+    fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
+        #pragma HLS pipeline
+        in_buff[i] = mem_port_in[i];        
+    }
 
     //FIR coeff
     int coeff[FIR_WINDOW_SIZE] = {
@@ -27,18 +42,14 @@ fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
         };
     //int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74};
 
-    //Shift registersint
-    int shift_reg[FIR_WINDOW_SIZE] = {0};
-    for (j = 0; j < FIR_WINDOW_SIZE; j++) {
-        shift_reg[j] = 0;
-    }
-
     // loop through each output
-    for (i = 0; i < BUFF_SIZE; i++ ) {
+    main_loop:for (i = 0; i < BUFF_SIZE; i++ ) {
+        #pragma HLS pipeline
         int acc = 0;
 
         // shift registers
-        for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
+        shift_reg:for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
+            //#pragma HLS pipeline
             shift_reg[j] = shift_reg[j -1];
         }
 
@@ -46,16 +57,16 @@ fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
         shift_reg[0] = in_buff[i];
 
         // do multiply-accumulate operation
-        for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+        mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+            //#pragma HLS pipeline
             acc += shift_reg[j] * coeff[j];
         }
-
         out_buff[i] = acc;
-
     }
     
     //store
     store_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
-                   mem_port_out[i] = out_buff[i];
-               }
+        #pragma HLS pipeline
+        mem_port_out[i] = out_buff[i];
+    }
 }
