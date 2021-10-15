@@ -18,6 +18,11 @@ const unsigned int FIR_WINDOW_SIZE = 100;
 const unsigned int OUT_BUFF_SIZE = BUFF_SIZE + FIR_WINDOW_SIZE - 1;
 const int iterations = 1;
 
+// Use this variable to constraint the total number of multipliers, 
+// otherwise it will use all the available DSPs and the design will not be feasible.
+// Tweak this value for the target platform to tradeoff area and performance
+const unsigned int FIR_NUM_MULT = 1;
+
 void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out);
 
 #endif /* FIR_HPP */
