@@ -23,13 +23,19 @@
 //const unsigned int c_min = 1;
 //const unsigned int c_max = MAT_SIZE;
 
+// solution based on https://github.com/Xilinx/SDSoC_Examples/blob/master/cpp/getting_started/direct_connect/src/mmult.cpp
+
 void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out,
 			args_t args0, args_t args1, args_t args2)
 {
-	int_data_t mat_a[MAT_SIZE][MAT_SIZE];
-	int_data_t mat_b[MAT_SIZE][MAT_SIZE];
+	// TODO: it would be nice to set the internal buffers to 32 bits instead of 64 to save BRAMs. However, for some 
+	// unknown reason, the data copy procedure presented below works only with memcpy
+
+	data_t mat_a[MAT_SIZE][MAT_SIZE];
+	data_t mat_b[MAT_SIZE][MAT_SIZE];
 	data_t mat_p[MAT_SIZE][MAT_SIZE];
-	int_data_t result, mult;
+	data_t result, mult;
+	int i,j,k,idx;
 
 	// TODO investigate the use of dataflow for bigger matrix
 	// The dataflow pragma seems to work to reduce the latency only when the matrix size is smaller.
@@ -52,21 +58,45 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 	// #pragma HLS ARRAY_PARTITION variable=mat_a complete dim=2
 	// #pragma HLS ARRAY_PARTITION variable=mat_b complete dim=1
 
-	// Burst reads on input matrices from DDR memory
 	// Burst read for matrix A, and B
+	// There are 3 different implementations to perform the initial memory copy: 
+	// - dual loop without pipeline pragma: works in the FPGA but the latency is too high. It stops working if pipeline pragma is used;
+	// - single loop with pipeline pragma: wont work in the FPGA because of the pipeline pragma
+	// - memcpy: the only solution that works in the FPGA and has a reasable latency. However, it does not allow to reduce the buffer to 32bit intergers.
+
+/*
+	data_t *data_A = (data_t *)&mem_port_in[args0 / sizeof (data_t)];
+	data_t *data_B = (data_t *)&mem_port_in[args1 / sizeof (data_t)];
+	data_t temp;
+	
+	idx=0;
+	read_data: for(i = 0; i < MAT_SIZE; i++){
+		for(j = 0; j < MAT_SIZE; j++){
+			temp = data_A[idx];
+			mat_a[i][j] = temp;
+			temp = data_B[idx];
+			mat_b[i][j] = temp;
+			idx++;
+		}
+	}
+	*/
+	/*
+
     read_data: for(int itr = 0 , i = 0 , j =0; itr < MAT_SIZE * MAT_SIZE; itr++, j++){
     	#pragma HLS PIPELINE
         if(j == MAT_SIZE) { j = 0 ; i++; }
-        mat_a[i][j] = (int_data_t)mem_port_in[itr + args0 / sizeof(data_t)];
-        mat_b[i][j] = (int_data_t)mem_port_in[itr + args1 / sizeof(data_t)];
+        mat_a[i][j] = data_A[itr];
+        mat_b[i][j] = data_B[itr];
     }
-//	std::memcpy((void *)mat_a,
-//				(const void *)( mem_port_in + args0 / sizeof(data_t) ),
-//				MAT_SIZE * MAT_SIZE * sizeof(data_t));
-//
-//	std::memcpy((void *)mat_b,
-//				(const void *)( mem_port_in + args1 / sizeof(data_t) ),
-//				MAT_SIZE * MAT_SIZE * sizeof(data_t));
+*/
+
+	std::memcpy((void *)mat_a,
+				(const void *)( mem_port_in + args0 / sizeof(data_t) ),
+				MAT_SIZE * MAT_SIZE * sizeof(data_t));
+
+	std::memcpy((void *)mat_b,
+				(const void *)( mem_port_in + args1 / sizeof(data_t) ),
+				MAT_SIZE * MAT_SIZE * sizeof(data_t));
 
 	// this limits the number of parallel multiplication it can handle.
 	// increasing this value will increase the number of DSP but decrease the latency
@@ -84,18 +114,18 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 	//  for the design.
 	// In this design, LOOP_TRIPCOUNT are not actually needed because the loop is 
 	//  bounded by constants. However it is a good practice to let this bounds explicit
-	mmult1: for (int i = 0; i < MAT_SIZE ; i++) {
+	mmult1: for (i = 0; i < MAT_SIZE ; i++) {
 	//#pragma HLS LOOP_TRIPCOUNT min=c_min max=c_max
-		mmult2: for (int j = 0; j < MAT_SIZE ; j++) {
+		mmult2: for (j = 0; j < MAT_SIZE ; j++) {
 		#pragma HLS PIPELINE
 		//#pragma HLS LOOP_TRIPCOUNT min=c_min max=c_max
 			result = 0;
-			mmult3: for (int k = 0; k < MAT_SIZE; k++) {
+			mmult3: for (k = 0; k < MAT_SIZE; k++) {
 			//#pragma HLS LOOP_TRIPCOUNT min=c_min max=c_max
 				mult = mat_a[i][k] * mat_b[k][j];
 				result += mult;
 			}
-			mat_p[i][j] = (data_t)result;
+			mat_p[i][j] = result;
 		}
 	}
 
