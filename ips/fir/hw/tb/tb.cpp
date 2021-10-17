@@ -26,36 +26,38 @@ void print_vect(data_t * base_idx, unsigned int size)
 	std::cout << std::endl;
 }
 
-int main (int argc, char **argv)
+void fir_reference(data_t *mem_port_in, data_t *mem_port_out)
 {
-    args_t id_out;
-    args_t args[ARGS_SIZE];
-    data_t in_buff [BUFF_SIZE], out_buff[BUFF_SIZE];
-    data_t out_buff_gold[BUFF_SIZE];
-    int i,j,error_code = 0;
+    int j, i;
+    int acc;
+    int in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
+    //Shift registers
+    int shift_reg[FIR_WINDOW_SIZE];
+
+    reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+        shift_reg[j] = 0;
+    }
+
+    //fetch data
+    fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
+        #pragma HLS pipeline
+        in_buff[i] = (int)mem_port_in[i];
+    }
 
     //FIR coeff
-//    data_t coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6};
-    const data_t coeff[FIR_WINDOW_SIZE] = {
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
-		};
+    const int coeff[FIR_WINDOW_SIZE] = {
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
+    };
 
-    //Shift registers
-    data_t shift_reg[FIR_WINDOW_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    //prepare input data
-    for(i = 0; i < BUFF_SIZE; i++)
-        in_buff[i] = (data_t) i;
-
-    // running the reference output
-    for (i = 0; i < BUFF_SIZE; i++ ) {
-        data_t acc = 0;
+    // loop through each output
+    main_loop:for (i = 0; i < BUFF_SIZE; i++ ) {
+        acc = 0;
 
         // shift registers
-        for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
+        shift_reg:for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
             shift_reg[j] = shift_reg[j -1];
         }
 
@@ -63,12 +65,28 @@ int main (int argc, char **argv)
         shift_reg[0] = in_buff[i];
 
         // do multiply-accumulate operation
-        for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+        mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
             acc += shift_reg[j] * coeff[j];
         }
-        out_buff_gold[i] = acc;
+        out_buff[i] = acc;
     }
 
+    //store
+    store_loop:for (i = 0; i < BUFF_SIZE; i++) {
+        mem_port_out[i] = (long)out_buff[i];
+    }
+}
+
+
+int main (int argc, char **argv)
+{
+    args_t id_out;
+    args_t args[ARGS_SIZE]={0};
+    data_t in_buff [BUFF_SIZE], out_buff[BUFF_SIZE];
+    data_t out_buff_gold[BUFF_SIZE];
+    int i,j,error_code = 0;
+
+    fir_reference(in_buff,out_buff_gold);
     //call fir accelerator
     fir_top(&id_out, args, in_buff, out_buff);
 
