@@ -25,6 +25,54 @@ void print_vect(data_t *base, unsigned int size)
 	printf("] \n");
 }
 
+void fir_reference(data_t *mem_port_in, data_t *mem_port_out)
+{
+    int j, i;
+    int acc;
+    int in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
+    //Shift registers
+    int shift_reg[FIR_WINDOW_SIZE];
+
+    reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+        shift_reg[j] = 0;
+    }
+
+    //fetch data
+    fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
+        in_buff[i] = (int)mem_port_in[i];
+    }
+
+    //FIR coeff
+    const int coeff[FIR_WINDOW_SIZE] = {
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
+            13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
+    };
+
+    // loop through each output
+    main_loop:for (i = 0; i < BUFF_SIZE; i++ ) {
+        acc = 0;
+        // shift registers
+        shift_reg:for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
+            shift_reg[j] = shift_reg[j -1];
+        }
+        // put the new input value into the first register
+        shift_reg[0] = in_buff[i];
+        // do multiply-accumulate operation
+        mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
+            acc += shift_reg[j] * coeff[j];
+        }
+        out_buff[i] = acc;
+    }
+
+    //store
+    store_loop:for (i = 0; i < BUFF_SIZE; i++) {
+        mem_port_out[i] = (long)out_buff[i];
+    }
+}
+
+
 int main (int argc, char **argv)
 {
 	printf(" starting fir \n");
@@ -42,19 +90,6 @@ int main (int argc, char **argv)
 
 	struct timespec start, end;
 	double time_taken;
-
-    //FIR coeff
-    const data_t coeff[FIR_WINDOW_SIZE] = {
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
-		};
-
-    //Shift registers
-    data_t shift_reg[FIR_WINDOW_SIZE];
-    for(i = 0; i < FIR_WINDOW_SIZE; i++)
-        shift_reg[i] = 0;
 
     // fred setup
 	retval = fred_init(&fred);
@@ -87,23 +122,7 @@ int main (int argc, char **argv)
 
     // running the reference output
 	clock_gettime(CLOCK_MONOTONIC, &start);
-    for (i = 0; i < BUFF_SIZE; i++ ) {
-        data_t acc = 0;
-
-        // shift registers
-        for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
-            shift_reg[j] = shift_reg[j -1];
-        }
-
-        // put the new input value into the first register
-        shift_reg[0] = in_buff[i];
-
-        // do multiply-accumulate operation
-        for (j = 0; j < FIR_WINDOW_SIZE; j++) {
-            acc += shift_reg[j] * coeff[j];
-        }
-        out_buff_gold[i] = acc;
-    }
+	fir_reference(in_buff,out_buff_gold);
 	clock_gettime(CLOCK_MONOTONIC, &end);
 
 	// Calculating total time taken by the sw implementation.

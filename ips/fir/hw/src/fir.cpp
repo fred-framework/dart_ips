@@ -19,7 +19,7 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
     //data_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
     int in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
     //Shift registers
-    static int shift_reg[FIR_WINDOW_SIZE];
+    static int shift_reg[FIR_WINDOW_SIZE]={0};
 #ifdef PERFORMANCE
     // when this pragma is enabled, the FPGA execution fails
     #pragma HLS ARRAY_PARTITION variable = shift_reg dim = 1 complete
@@ -30,12 +30,12 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 	#pragma HLS reset variable=shift_reg
 	//#pragma HLS dataflow
     //#pragma HLS pipeline
-    /*
+    
     reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
 		//#pragma HLS pipeline
         shift_reg[j] = 0;
     }
-    */
+    
 
 
     //fetch data
