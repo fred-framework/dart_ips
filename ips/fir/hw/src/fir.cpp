@@ -7,57 +7,68 @@
 #include <cstring>
 #include "fir.hpp"
 
-#define PERFORMANCE
+//#define PERFORMANCE
 
 void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 {
     int j, i;
-    data_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
-    //uint32_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
+    int acc;
+    //data_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
+    int in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
     //Shift registers
-    data_t shift_reg[FIR_WINDOW_SIZE];
+    int shift_reg[FIR_WINDOW_SIZE];
 #ifdef PERFORMANCE
+    // when this pragma is enabled, the FPGA execution fails
     #pragma HLS ARRAY_PARTITION variable = shift_reg dim = 1 complete
 #endif
+    // when this pragma is enabled, the routing tasks too long 
+    //#pragma HLS ARRAY_PARTITION variable = shift_reg block factor=10
 	// it seems that this loop could be avoided by using the reset pragma. TODO: confirm it 
 	#pragma HLS reset variable=shift_reg
+	//#pragma HLS dataflow
     /*
     reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
-		#pragma HLS pipeline
+		//#pragma HLS pipeline
         shift_reg[j] = 0;
     }
     */
 
+
     //fetch data
-    /*
+
     fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
         #pragma HLS pipeline
-        in_buff[i] = (uint32_t)mem_port_in[i];        
+        in_buff[i] = (int)mem_port_in[i];
+        //in_buff[i] = (uint32_t)mem_port_in[i];
     }
-    */
-    memcpy((void *)in_buff,(void *)mem_port_in,BUFF_SIZE*sizeof(data_t));
+
+    //memcpy((void *)in_buff,(void *)mem_port_in,BUFF_SIZE*sizeof(data_t));
 
     //FIR coeff
-    data_t coeff[FIR_WINDOW_SIZE] = {
+    const int coeff[FIR_WINDOW_SIZE] = {
         13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
         13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
         13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
         13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
         };
     //int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74};
+	//#pragma HLS ARRAY_PARTITION variable = coeff block factor=10
 
     // constraint the total number of multipliers, otherwise it will use all the available DSPs
     // and the design will not be feasible
-	#pragma HLS ALLOCATION instances=mul limit=FIR_NUM_MULT operation
+	//#pragma HLS ALLOCATION instances=mul limit=FIR_NUM_MULT operation
 
     // loop through each output
     main_loop:for (i = 0; i < BUFF_SIZE; i++ ) {
-        #pragma HLS pipeline
-        data_t acc = 0;
+        // When this pragma is enabled, DART cannot implement the design
+        //#pragma HLS pipeline
+		//#pragma HLS unroll factor=16
+        acc = 0;
 
         // shift registers
         shift_reg:for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
-            //#pragma HLS pipeline
+            #pragma HLS pipeline
+            //#pragma HLS unroll
             shift_reg[j] = shift_reg[j -1];
         }
 
@@ -66,15 +77,21 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 
         // do multiply-accumulate operation
         mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
-            //#pragma HLS pipeline
+			#pragma HLS unroll factor=4
+            #pragma HLS pipeline
             acc += shift_reg[j] * coeff[j];
         }
         out_buff[i] = acc;
     }
     
     //store
+
     store_loop:for (i = 0; i < BUFF_SIZE; i++) {
         #pragma HLS pipeline
-        mem_port_out[i] = (data_t)out_buff[i];
+        //mem_port_out[i] = (data_t)out_buff[i];
+        mem_port_out[i] = (long)out_buff[i];
     }
+
+    //memcpy((void *)mem_port_out,(void *)out_buff,BUFF_SIZE*sizeof(data_t));
+
 }
