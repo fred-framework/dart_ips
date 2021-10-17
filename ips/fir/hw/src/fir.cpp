@@ -4,6 +4,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 */
+
+// alternative implementation https://github.com/xupgit/High-Level-Synthesis-Flow-on-Zynq-using-Vivado-HLS/blob/master/source/lab4/fir.c
+
 #include <cstring>
 #include "fir.hpp"
 
@@ -16,16 +19,17 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
     //data_t in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
     int in_buff [BUFF_SIZE], out_buff [BUFF_SIZE];
     //Shift registers
-    int shift_reg[FIR_WINDOW_SIZE];
+    static int shift_reg[FIR_WINDOW_SIZE];
 #ifdef PERFORMANCE
     // when this pragma is enabled, the FPGA execution fails
     #pragma HLS ARRAY_PARTITION variable = shift_reg dim = 1 complete
 #endif
     // when this pragma is enabled, the routing tasks too long 
-    //#pragma HLS ARRAY_PARTITION variable = shift_reg block factor=10
+    //#pragma HLS ARRAY_PARTITION variable = shift_reg cyclic factor=4
 	// it seems that this loop could be avoided by using the reset pragma. TODO: confirm it 
 	#pragma HLS reset variable=shift_reg
 	//#pragma HLS dataflow
+    //#pragma HLS pipeline
     /*
     reset_shift_reg:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
 		//#pragma HLS pipeline
@@ -46,13 +50,10 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 
     //FIR coeff
     const int coeff[FIR_WINDOW_SIZE] = {
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6,
-        13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 13, -2, 9, 11, 26, 18, 95, -43, 6, 74, 26, 18, 95, -43, 6
-        };
+        #include "fir_coef.dat"
+    };
     //int coeff[FIR_WINDOW_SIZE] = {13, -2, 9, 11, 26, 18, 95, -43, 6, 74};
-	//#pragma HLS ARRAY_PARTITION variable = coeff block factor=10
+	//#pragma HLS ARRAY_PARTITION variable = coeff cyclic factor=4
 
     // constraint the total number of multipliers, otherwise it will use all the available DSPs
     // and the design will not be feasible
@@ -77,7 +78,7 @@ void fir(volatile data_t *mem_port_in, volatile data_t *mem_port_out)
 
         // do multiply-accumulate operation
         mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
-			#pragma HLS unroll factor=4
+		#pragma HLS unroll factor=2
             #pragma HLS pipeline
             acc += shift_reg[j] * coeff[j];
         }

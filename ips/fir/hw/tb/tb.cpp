@@ -40,7 +40,6 @@ void fir_reference(data_t *mem_port_in, data_t *mem_port_out)
 
     //fetch data
     fetch_loop:for (unsigned i = 0; i < BUFF_SIZE; i++) {
-        #pragma HLS pipeline
         in_buff[i] = (int)mem_port_in[i];
     }
 
@@ -55,15 +54,12 @@ void fir_reference(data_t *mem_port_in, data_t *mem_port_out)
     // loop through each output
     main_loop:for (i = 0; i < BUFF_SIZE; i++ ) {
         acc = 0;
-
         // shift registers
         shift_reg:for (j = FIR_WINDOW_SIZE - 1; j > 0; j--) {
             shift_reg[j] = shift_reg[j -1];
         }
-
         // put the new input value into the first register
         shift_reg[0] = in_buff[i];
-
         // do multiply-accumulate operation
         mac:for (j = 0; j < FIR_WINDOW_SIZE; j++) {
             acc += shift_reg[j] * coeff[j];

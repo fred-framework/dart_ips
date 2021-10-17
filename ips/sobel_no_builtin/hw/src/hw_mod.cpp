@@ -21,7 +21,7 @@
 #define U32_B2(pixel) (((pixel) >> 16) & 0xff)
 #define U32_B3(pixel) (((pixel) >> 24) & 0xff)
 
-//#define PERFORMANCE
+// #define PERFORMANCE
 // When this parameter is defined, the input memory is duplicated, removing internal dependencies in the main pipeline,
 // leading the to the most optimized performance assuming the PREM approach
 
