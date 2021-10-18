@@ -21,7 +21,7 @@
 
 // Although "data_t" cannot be changed to work w DART, the internal data size can be changed
 //  to save resources. Change "int_data_t" accordingly to change the internal data size.
-typedef uint64_t int_data_t;
+//typedef uint64_t int_data_t;
 
 // ****************************************************************
 // Implementation parameters to play with area vs latency tradeoff

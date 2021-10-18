@@ -19,10 +19,6 @@
 #include "mat_mult_top.hpp"
 #include "mat_mult.hpp"
 
-//TRIPCOUNT identifiers
-//const unsigned int c_min = 1;
-//const unsigned int c_max = MAT_SIZE;
-
 // solution based on https://github.com/Xilinx/SDSoC_Examples/blob/master/cpp/getting_started/direct_connect/src/mmult.cpp
 
 void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t *mem_port_out,
@@ -37,15 +33,9 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 	data_t result, mult;
 	int i,j,k,idx;
 
-	// TODO investigate the use of dataflow for bigger matrix
-	// The dataflow pragma seems to work to reduce the latency only when the matrix size is smaller.
-	// For example, the design with size 32 didnt work with dataflow, but it works without it.
-	// The same happens with MAT_SIZE == 16. Although there was a latency reduction from 1820 cycles wo dataflow to 1060 w dataflow, the design does not work i nthe FPGA
-#if MAT_SIZE == 8
-	// MAT_SIZE == 8 has latency of 479 cycles wo dataflow and 290 w dataflow
-	// dataflow reduced II of the 1st loop from 2 to 1, while the 2nd and main loop from 4 to 1.
- 	#pragma HLS DATAFLOW
-#endif
+	// TODO investigate the use of dataflow pargma messes up with the design (e.g. hls/dart gives error). check it further in the future
+ 	//#pragma HLS DATAFLOW
+
 	// factor of 4 cause these warnings below which means that the latency is suboptimal due to the lack of enough memory ports to read/write form the memories
 	// WARNING: [SCHED 204-69] Unable to satisfy resource constraint for operation type mul(II = 1)..
 	// WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('mat_a_0_load_4', src/mat_mult.cpp:73->src/mat_mult_top.cpp:31->src/mat_mult_top.cpp:16) on array 'mat_a[0]', src/mat_mult.cpp:26->src/mat_mult_top.cpp:31->src/mat_mult_top.cpp:16 due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'mat_a_0'.
@@ -106,14 +96,6 @@ void mat_mult(volatile args_t *id, volatile data_t *mem_port_in, volatile data_t
 	// Performs matrix multiply over matrices A and B and stores the result
 	// in "out". All the matrices are square matrices of the form (size x size)
 	// Typical Matrix multiplication Algorithm is as below
-
-	// In cases where the loop latency is unknown or cannot be calculate, the 
-	//  TRIPCOUNT pragma lets you specify minimum and maximum iterations for a loop. 
-	//  This lets the tool analyze how the loop latency contributes to the total 
-	//  design latency in the reports, and helps you determine appropriate optimizations 
-	//  for the design.
-	// In this design, LOOP_TRIPCOUNT are not actually needed because the loop is 
-	//  bounded by constants. However it is a good practice to let this bounds explicit
 	mmult1: for (i = 0; i < MAT_SIZE ; i++) {
 	//#pragma HLS LOOP_TRIPCOUNT min=c_min max=c_max
 		mmult2: for (j = 0; j < MAT_SIZE ; j++) {

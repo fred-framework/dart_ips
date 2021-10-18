@@ -100,9 +100,9 @@ int main()
 	}
 
 	std::cout << "Expected value: ";
-	print_mat((data_t *)mem_expected_out, MAT_SIZE);
+	//print_mat((data_t *)mem_expected_out, MAT_SIZE);
 	std::cout << "Output value  : ";
-	print_mat((data_t *)mem_out, MAT_SIZE);
+	//print_mat((data_t *)mem_out, MAT_SIZE);
 	
 	return error_code ;
 }
