@@ -23,6 +23,12 @@ if (EMULATE_GPU_OFFLOADING)
   add_definitions(-DEMULATE_GPU_OFFLOADING)
 endif()
 
+# application dependent options
+set(SOBEL_IMG_WIDTH "256" CACHE STRING "Sobel image width")
+set(SOBEL_IMG_HEIGHT "256" CACHE STRING "Sobel image height")
+add_definitions(-DIMG_WIDTH=${SOBEL_IMG_WIDTH})
+add_definitions(-DIMG_HEIGHT=${SOBEL_IMG_HEIGHT})
+
 # Check the supported CPU archtectures
 if (NOT (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR  CMAKE_SYSTEM_PROCESSOR STREQUAL "armv7l"))
   message(FATAL_ERROR "Unsupported architecture ${CMAKE_SYSTEM_PROCESSOR}. Only aarch64, armv7l, and x86_64 are supported.")
@@ -143,6 +149,6 @@ endif()
 # endif()
 
 # include the sw sobel reference implementation
-target_include_directories(synthetic PRIVATE src/reference/src)
-target_link_libraries(synthetic ${PROJECT_SOURCE_DIR}/src/reference/src/libsobel.a)
-target_link_libraries(synthetic m)
+#target_include_directories(synthetic PRIVATE src/reference/src)
+#target_link_libraries(synthetic ${PROJECT_SOURCE_DIR}/src/reference/src/libsobel.a)
+#target_link_libraries(synthetic m)

@@ -21,6 +21,7 @@ ips/prem*/hw/prem*/**
 ips/gmap/hw/gmap*/**
 ips/fastx/hw/fastx*/**
 ips/sobel/hw/sobel*/**
+ips/sobel_no_builtin/hw/sobel*/**
 ips/finn/hw/finn*/**
 
 #################################################

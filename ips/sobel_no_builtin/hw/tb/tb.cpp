@@ -25,8 +25,8 @@ typedef uint32_t args_t;
 typedef uint64_t data_t;
 static const uint8_t ARGS_SIZE = 8;
 
-static const unsigned int IMG_WIDTH = 512;
-static const unsigned int IMG_HEIGHT = 512;
+static const unsigned int IMG_WIDTH = 256;
+static const unsigned int IMG_HEIGHT = 256;
 
 void sobel_top(args_t *id, args_t args[ARGS_SIZE], volatile data_t *mem_in, volatile data_t *mem_out);
 
