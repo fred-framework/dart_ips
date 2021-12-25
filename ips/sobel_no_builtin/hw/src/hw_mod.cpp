@@ -10,7 +10,7 @@
  * (at your option) any later version.
 */
 
-#include <hls_video.h>
+//#include <hls_video.h>
 #include <ap_fixed.h>
 #include <stdint.h>
 #include "sobel_top.hpp"

@@ -4,7 +4,10 @@ set pwd [pwd]
 set num_slots 1
 set prj_name "fir"
 set top_name "fir_top"
-set device {xc7z020clg400-1}
+# for pynq
+#set device {xc7z020clg400-1}
+# for zcu102
+set device {xczu9eg-ffvb1156-2-i}
 set period 10
 set sim 0 
 

@@ -54,6 +54,13 @@ Fred finished
 |   DSP48E1 only |    3 |       |           |       |
 
 
+# Deprecated Libraries
+
+This IP uses he Vivado HLS Video Library (hls_video.h) has been [deprecated in the 2020.1](https://support.xilinx.com/s/article/75345?language=en_US) release and is no longer supported. This library has been replaced by the Vitis Vision Library.
+
+So, it is necessary to migrate the code to the new library. Examples can be found in
+[https://github.com/Xilinx/Vitis_Libraries/tree/2020.2/vision](https://github.com/Xilinx/Vitis_Libraries/tree/2020.2/vision).
+
 # Performance
 
 The estimated latency is 266785 clock cycles or 2.668 ms assuming 10ns clock period. 

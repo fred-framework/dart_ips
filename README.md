@@ -2,6 +2,17 @@
 # DART IPs
 
 This repository has a list of ready-to-use hardware IPs and static parts for DART.
+This specific branch has adaptations to work with **Vivado 2020.2** and ZCU102 board.
+
+# **WARNINIG**
+
+Vivado 2020.2 has a bug in *vitis_hls* that leads to an error when running the *export_design* command.
+
+This can be solved by running the following command:
+
+```
+sudo date -s '2021-12-25 12:34:56'
+```
 
 ## Summary of IPs
 

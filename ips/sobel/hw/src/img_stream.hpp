@@ -13,7 +13,13 @@
 #ifndef IMG_STREAM
 #define IMG_STREAM
 
-#include <hls_video.h>
+/*
+The Vivado HLS Video Library (hls_video.h) has been deprecated in the 2020.1 release and is no longer supported.
+This library has been replaced by the Vitis Vision Library.
+https://support.xilinx.com/s/article/75345?language=en_US
+https://github.com/Xilinx/Vitis_Libraries/tree/2020.2/vision
+*/
+// #include <hls_video.h>
 #include <iostream>
 #include <ap_fixed.h>
 
@@ -50,7 +56,7 @@ template<int ROWS, int COLS, int T>
 static inline void read_image_32_(volatile data_t *img_addr, hls::Mat<ROWS, COLS, T> &mat_image)
 {
 	data_t pixel_in_p;
-	hls::Scalar<HLS_MAT_CN(T), HLS_TNAME(T)> pixel_in;
+	xf::cv::Scalar<HLS_MAT_CN(T), HLS_TNAME(T)> pixel_in;
 
 	for (int line = 0; line < ROWS; ++line) {
 		for (int off = 0; off < COLS; ++off) {
