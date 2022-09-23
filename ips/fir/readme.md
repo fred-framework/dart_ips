@@ -6,13 +6,15 @@ The [FIR filter](https://en.wikipedia.org/wiki/Finite_impulse_response) is used 
 This IP also includes a self-checking testbench and a software example. The software has been tested successfully in the Pynq board. This is the expected output when running in the FPGA:
 
 ```
-# ./synthetic
+
+# xilinx-zcu102-2020_2:~/repos/rtas22-dart-design/fir/sw# ./run.sh 
+power sample PID: 733
  starting fir 
 fred_lib: connected to fred server!
-buff: buffer mapped at addresses: 0x36ca9000, length:1048576 
-buff: buffer mapped at addresses: 0x36ba9000, length:1048576 
-Time taken by the CPU is : 00.054382
-Time taken by FRED is : 00.034146
+buff: buffer mapped at addresses: 0xffffa1918000, length:32768 
+buff: buffer mapped at addresses: 0xffffa1910000, length:32768 
+Time taken by the CPU is : 00.024602
+Time taken by FRED is : 00.006673
 Match!
 Expected value[0:9]:
 [ 0 13 24 44 75 132 207 377 504 637 ] 
@@ -21,37 +23,41 @@ Output value[0:9]:
 Fred finished 
 ```
 
+FRED timing sample:
+
+```
+root@xilinx-zcu102-2020_2:/opt/fredsys# cat log.txt 
+0000000006173719:       fred_sys: hw-task: fir got slot: 0 of its partition: p0, inserted in fri queue
+0000000006173854:       fred_sys: start rcfg of slot: 0 of partition: p0 for hw-task: fir
+0000000006177429:       fred_sys: devcfg, slot: 0 of partition: p0 rcfg completed for hw-task: fir in 3489 us
+0000000006177465:       fred_sys: slot: 0 of partition: p0 started for hw-task: fir
+0000000006183944:       fred_sys: slot: 0 of partition: p0 completed execution of hw-task: fir in 6467 us
+0000001077373420:       fred_sys: hw-task: fir got slot: 0 of its partition: p0, inserted in fri queue
+0000001077373515:       fred_sys: skipping rcfg of slot: 0 of partition: p0 for hw-task: fir
+0000001077373543:       fred_sys: slot: 0 of partition: p0 started for hw-task: fir
+0000001077380021:       fred_sys: slot: 0 of partition: p0 completed execution of hw-task: fir in 6466 us
+0000001449407334:       fred_sys: hw-task: fir got slot: 0 of its partition: p0, inserted in fri queue
+0000001449407423:       fred_sys: skipping rcfg of slot: 0 of partition: p0 for hw-task: fir
+0000001449407450:       fred_sys: slot: 0 of partition: p0 started for hw-task: fir
+0000001449413929:       fred_sys: slot: 0 of partition: p0 completed execution of hw-task: fir in 6467 us
+0000001583840727:       fred_sys: hw-task: fir got slot: 0 of its partition: p0, inserted in fri queue
+0000001583840790:       fred_sys: skipping rcfg of slot: 0 of partition: p0 for hw-task: fir
+0000001583840816:       fred_sys: slot: 0 of partition: p0 started for hw-task: fir
+0000001583847296:       fred_sys: slot: 0 of partition: p0 completed execution of hw-task: fir in 6467 us
+```
+
 ## Resource Utilization
 
+ - Device: xczu9egffvb1156-2
+ - Board: zcu102
+
+
 |          Site Type         | Used | Fixed | Available | Util% |
-|----------------------------|-----:|------:|----------:|------:|
-| Slice LUTs*                | 1132 |     0 |     53200 |  2.13 |
-|   LUT as Logic             | 1066 |     0 |     53200 |  2.00 |
-|   LUT as Memory            |   66 |     0 |     17400 |  0.38 |
-|     LUT as Distributed RAM |    0 |     0 |           |       |
-|     LUT as Shift Register  |   66 |     0 |           |       |
-| Slice Registers            | 1872 |     0 |    106400 |  1.76 |
-|   Register as Flip Flop    | 1872 |     0 |    106400 |  1.76 |
-|   Register as Latch        |    0 |     0 |    106400 |  0.00 |
-| F7 Muxes                   |    8 |     0 |     26600 |  0.03 |
-| F8 Muxes                   |    0 |     0 |     13300 |  0.00 |
++----------------------------+------+-------+-----------+-------+
+| CLB LUTs*                  | 1964 |     0 |    274080 |  0.72 |
+| Block RAM Tile             | 12.5 |     0 |       912 |  1.37 |
+| DSPs                       |    4 |     0 |      2520 |  0.16 |
 
-|     Site Type     | Used | Fixed | Available | Util% |
-|-------------------|-----:|------:|----------:|------:|
-| Block RAM Tile    | 11.5 |     0 |       140 |  8.21 |
-|   RAMB36/FIFO*    |   11 |     0 |       140 |  7.86 |
-|     RAMB36E1 only |   11 |       |           |       |
-|   RAMB18          |    1 |     0 |       280 |  0.36 |
-|     RAMB18E1 only |    1 |       |           |       |
-
-|    Site Type   | Used | Fixed | Available | Util% |
-|----------------|-----:|------:|----------:|------:|
-| DSPs           |    2 |     0 |       220 |  0.91 |
-|   DSP48E1 only |    2 |       |           |       |
-
-# Performance
-
-The estimated latency is 2486491 clock cycles or 24.865 ms assuming 10ns clock period. 
 
 ## Authors
 
